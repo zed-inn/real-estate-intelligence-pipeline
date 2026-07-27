@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package intelligence_events;
+
+enum PropertyType {
+  APARTMENT = 0;
+  VILLA = 1;
+  INDEPENDENT_HOUSE = 2;
+  BUILDER_FLOOR = 3;
+  PENTHOUSE = 4;
+  STUDIO_APARTMENT = 5;
+  DUPLEX = 6;
+  TRIPLEX = 7;
+  FARM_HOUSE = 8;
+  AGRICULTURAL_LAND = 9;
+  RESIDENTIAL_PLOT = 10;
+  COMMERCIAL_OFFICE = 11;
+  RETAIL_SHOP = 12;
+  SERVICED_APARTMENT = 13;
+  CO_WORKING_SPACE = 14;
+}
+
+enum FacingDirection {
+  NORTH = 0;
+  EAST = 1;
+  NORTH_EAST = 2;
+  SOUTH = 3;
+  WEST = 4;
+  NORTH_WEST = 5;
+  SOUTH_EAST = 6;
+  SOUTH_WEST = 7;
+}
+
+enum FurnishingStatus {
+  UNFURNISHED = 0;
+  SEMI_FURNISHED = 1;
+  FULLY_FURNISHED = 2;
+  BARE_SHELL = 3;
+  WARM_SHELL = 4;
+  CUSTOM_FURNISHED = 5;
+}
+
+enum WaterSupply {
+  MUNICIPAL = 0;
+  BOREWELL = 1;
+  MUNICIPAL_AND_BOREWELL = 2;
+  WATER_TANKER = 3;
+  RO_PLANT = 4;
+  TREATED_WATER = 5;
+  GRAM_PANCHAYAT = 6;
+}
+
+enum PossessionStatus {
+  READY_TO_MOVE = 0;
+  UNDER_CONSTRUCTION = 1;
+  NEW_LAUNCH = 2;
+}
+
+enum PowerBackup {
+  NONE = 0;
+  PARTIAL = 1;
+  FULL_24X7 = 2;
+}
+
+enum OwnershipType {
+  FREEHOLD = 0;
+  LEASEHOLD = 1;
+  CO_OPERATIVE_SOCIETY = 2;
+  POWER_OF_ATTORNEY = 3;
+}
+
+enum ReraStatus {
+  RERA_APPROVED = 0;
+  RERA_PENDING = 1;
+  NOT_APPLICABLE = 2;
+}
+
+enum FlooringType {
+  VITRIFIED = 0;
+  MARBLE = 1;
+  WOODEN = 2;
+  GRANITE = 3;
+  MOSAIC = 4;
+  CEMENT = 5;
+}
+
+enum CityTier {
+  TIER_1 = 0;
+  TIER_2 = 1;
+  TIER_3 = 2;
+}
+
+message PropertyIngestedEvent {
+  string property_id = 1;
+  string city = 4;
+  string pin_code = 6;
+  string state = 7;
+  double price_cr = 12;
+  
+  optional string address = 102; 
+  optional string society_name = 2;
+  optional string locality = 3;
+  optional CityTier city_tier = 5;
+  
+  optional double price_per_sqft = 13;
+  
+  optional int32 bhk = 22;
+  optional int32 carpet_area_sqft = 25;
+  optional PropertyType property_type = 32;
+
+  optional double latitude = 8;
+  optional double longitude = 9;
+  optional string zone = 10;
+  optional string landmark = 11;
+  
+  optional double maintenance_monthly = 14;
+  optional string maintenance_cycle = 15;
+  optional double property_tax_yearly = 16;
+  optional double stamp_duty_est = 17;
+  optional double registration_fees_est = 18;
+  optional double booking_amount = 19;
+  optional double expected_rental_yield = 20;
+  optional bool is_negotiable = 21;
+  
+  optional int32 bathrooms = 23;
+  optional int32 balconies = 24;
+  optional int32 super_built_up_area_sqft = 26;
+  optional int32 plot_area_sqft = 27;
+  optional double length_ft = 28;
+  optional double width_ft = 29;
+  optional int32 floor_number = 30;
+  optional int32 total_floors = 31;
+  
+  optional FacingDirection facing_direction = 33;
+  optional FurnishingStatus furnishing_status = 34;
+  optional WaterSupply water_supply = 35;
+  optional FlooringType flooring_type = 36; 
+  optional PossessionStatus possession_status = 37;
+  optional PowerBackup power_backup = 38;
+  optional OwnershipType ownership_type = 39;
+  optional ReraStatus rera_status = 40;
+  optional string khata_type = 41;
+  
+  optional bool has_pooja_room = 42;
+  optional bool has_servant_room = 43;
+  optional bool has_study_room = 44;
+  optional bool has_store_room = 45;
+  optional bool has_private_terrace = 46;
+  optional bool has_private_garden = 47;
+  optional bool has_basement = 48;
+  optional bool is_duplex = 49;
+  optional bool is_corner_plot = 50;
+  optional bool has_modular_kitchen = 51;
+  
+  optional int32 covered_parking_spots = 52;
+  optional int32 open_parking_spots = 53;
+  optional bool has_ev_charging = 54;
+  optional bool has_visitor_parking = 55;
+  optional int32 number_of_lifts = 56;
+  optional int32 service_lifts = 57;
+  optional bool has_stp = 58; 
+  optional bool has_rainwater_harvesting = 59;
+  optional bool has_solar_panels = 60;
+  optional bool has_piped_gas = 61;
+  
+  optional bool has_swimming_pool = 62;
+  optional bool has_gymnasium = 63;
+  optional bool has_clubhouse = 64;
+  optional bool has_kids_play_area = 65;
+  optional bool has_jogging_track = 66;
+  optional bool has_tennis_court = 67;
+  optional bool has_badminton_court = 68;
+  optional bool has_squash_court = 69;
+  optional bool has_indoor_games = 70;
+  optional bool has_mini_theatre = 71;
+  
+  optional bool has_pharmacy = 72;
+  optional bool has_atm = 73;
+  optional bool has_grocery_store = 74;
+  optional bool has_clinic = 75;
+  optional bool has_creche = 76;
+  optional bool has_salon = 77;
+  optional bool has_dog_park = 78;
+  optional bool has_library = 79;
+  optional bool has_banquet_hall = 80;
+  optional bool has_temple = 81;
+  
+  optional bool has_24x7_security = 82;
+  optional bool has_cctv = 83;
+  optional bool has_intercom = 84;
+  optional bool has_video_door_phone = 85;
+  optional bool has_biometric_access = 86;
+  optional bool has_fire_alarm = 87;
+  optional bool has_fire_extinguishers = 88;
+  optional bool is_gated_community = 89;
+  optional bool has_guard_room = 90;
+  optional bool has_boom_barrier = 91;
+  
+  optional double distance_metro_km = 92;
+  optional double distance_airport_km = 93;
+  optional double distance_hospital_km = 94;
+  optional double distance_school_km = 95;
+  optional double distance_mall_km = 96;
+  optional double distance_bus_stop_km = 97;
+  optional double walkability_score = 98; 
+  optional double safety_score = 99;
+  optional double livability_score = 100;
+  optional double green_cover_score = 101;
+}

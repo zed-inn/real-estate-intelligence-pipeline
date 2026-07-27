@@ -5,8 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "betterproto[compiler]>=1.2.5",
+    "betterproto[compiler]>=2.0.0b6",
     "confluent-kafka>=2.15.0",
+    "grpcio-tools>=1.83.0",
     "grpclib>=0.4.9",
     "ollama>=0.6.2",
     "psycopg[binary]>=3.3.4",

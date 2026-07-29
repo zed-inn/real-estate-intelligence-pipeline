@@ -3,7 +3,7 @@ import { vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const properties = pgTable('properties', {
-  id: uuid('id').default(sql`uuid_generate_v7()`).primaryKey(),
+  id: uuid('id').default(sql`uuidv7()`).primaryKey(),
 
   city: varchar('city', { length: 100 }).notNull(),
   pinCode: varchar('pin_code', { length: 10 }).notNull(),
@@ -26,7 +26,7 @@ export const properties = pgTable('properties', {
 });
 
 export const outbox = pgTable('outbox', {
-  id: uuid('id').default(sql`uuid_generate_v7()`).primaryKey(),
+  id: uuid('id').default(sql`uuidv7()`).primaryKey(),
   topic: varchar('topic', { length: 255 }).notNull(),
   payload: text('payload').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

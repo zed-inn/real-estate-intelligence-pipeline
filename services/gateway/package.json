@@ -13,13 +13,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bufbuild/protobuf": "^2.13.0",
     "@confluentinc/kafka-javascript": "^1.10.0",
     "@grpc/grpc-js": "^1.14.4",
     "@grpc/proto-loader": "^0.8.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
-    "fastify": "^5.10.0",
+    "fastify": "^5.11.0",
     "fastify-type-provider-zod": "^7.0.0",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"

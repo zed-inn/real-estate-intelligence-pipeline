@@ -1,6 +1,9 @@
 import { pgTable, uuid, varchar, numeric, jsonb, text, timestamp, integer } from 'drizzle-orm/pg-core';
 import { vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-zod';
+import { z } from 'zod';
+
 
 export const properties = pgTable('properties', {
   id: uuid('id').default(sql`uuidv7()`).primaryKey(),
@@ -30,4 +33,12 @@ export const outbox = pgTable('outbox', {
   topic: varchar('topic', { length: 255 }).notNull(),
   payload: text('payload').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// zod schemas of table schemas
+export const PropertySchema = createSelectSchema(properties, {
+  createdAt: z.coerce.date(),
+});
+export const OutboxSchema = createSelectSchema(outbox, {
+  createdAt: z.coerce.date(),
 });

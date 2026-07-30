@@ -8,10 +8,9 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },

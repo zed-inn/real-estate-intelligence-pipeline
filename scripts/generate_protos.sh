@@ -18,10 +18,7 @@ echo "----------------------------------------"
 
 echo "Generating Python Protobuf schemas..."
 cd "$ROOT_DIR/services/engine"
-uv run python -m grpc_tools.protoc \
-  -I "$ROOT_DIR/shared/proto" \
-  --python_betterproto_out=./generated \
-  "$ROOT_DIR/shared/proto/"*.proto
+uv run buf generate
 echo "Python Protobuf schemas generated successfully!"
 
 echo "----------------------------------------"

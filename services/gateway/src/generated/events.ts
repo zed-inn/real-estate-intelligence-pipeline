@@ -9,6 +9,87 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
 export const protobufPackage = "intelligence_events";
 
+export enum FieldCategory {
+  CATEGORY_UNSPECIFIED = 0,
+  CATEGORY_SKIP = 1,
+  CATEGORY_LOCATION = 2,
+  CATEGORY_PRICING = 3,
+  CATEGORY_SPEC = 4,
+  CATEGORY_AMENITY = 5,
+  CATEGORY_SECURITY = 6,
+  CATEGORY_PROXIMITY = 7,
+  CATEGORY_SCORE = 8,
+  CATEGORY_INFRASTRUCTURE = 9,
+  UNRECOGNIZED = -1,
+}
+
+export function fieldCategoryFromJSON(object: any): FieldCategory {
+  switch (object) {
+    case 0:
+    case "CATEGORY_UNSPECIFIED":
+      return FieldCategory.CATEGORY_UNSPECIFIED;
+    case 1:
+    case "CATEGORY_SKIP":
+      return FieldCategory.CATEGORY_SKIP;
+    case 2:
+    case "CATEGORY_LOCATION":
+      return FieldCategory.CATEGORY_LOCATION;
+    case 3:
+    case "CATEGORY_PRICING":
+      return FieldCategory.CATEGORY_PRICING;
+    case 4:
+    case "CATEGORY_SPEC":
+      return FieldCategory.CATEGORY_SPEC;
+    case 5:
+    case "CATEGORY_AMENITY":
+      return FieldCategory.CATEGORY_AMENITY;
+    case 6:
+    case "CATEGORY_SECURITY":
+      return FieldCategory.CATEGORY_SECURITY;
+    case 7:
+    case "CATEGORY_PROXIMITY":
+      return FieldCategory.CATEGORY_PROXIMITY;
+    case 8:
+    case "CATEGORY_SCORE":
+      return FieldCategory.CATEGORY_SCORE;
+    case 9:
+    case "CATEGORY_INFRASTRUCTURE":
+      return FieldCategory.CATEGORY_INFRASTRUCTURE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return FieldCategory.UNRECOGNIZED;
+  }
+}
+
+export function fieldCategoryToJSON(object: FieldCategory): string {
+  switch (object) {
+    case FieldCategory.CATEGORY_UNSPECIFIED:
+      return "CATEGORY_UNSPECIFIED";
+    case FieldCategory.CATEGORY_SKIP:
+      return "CATEGORY_SKIP";
+    case FieldCategory.CATEGORY_LOCATION:
+      return "CATEGORY_LOCATION";
+    case FieldCategory.CATEGORY_PRICING:
+      return "CATEGORY_PRICING";
+    case FieldCategory.CATEGORY_SPEC:
+      return "CATEGORY_SPEC";
+    case FieldCategory.CATEGORY_AMENITY:
+      return "CATEGORY_AMENITY";
+    case FieldCategory.CATEGORY_SECURITY:
+      return "CATEGORY_SECURITY";
+    case FieldCategory.CATEGORY_PROXIMITY:
+      return "CATEGORY_PROXIMITY";
+    case FieldCategory.CATEGORY_SCORE:
+      return "CATEGORY_SCORE";
+    case FieldCategory.CATEGORY_INFRASTRUCTURE:
+      return "CATEGORY_INFRASTRUCTURE";
+    case FieldCategory.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum PropertyType {
   APARTMENT = 0,
   VILLA = 1,
@@ -567,12 +648,18 @@ export function cityTierToJSON(object: CityTier): string {
   }
 }
 
+export interface PropertyFieldMetadata {
+  naturalTone?: string | undefined;
+  label?: string | undefined;
+  category?: FieldCategory | undefined;
+}
+
 export interface PropertyIngestedEvent {
   propertyId?: string | undefined;
   city?: string | undefined;
   pinCode?: string | undefined;
   state?: string | undefined;
-  priceCr?: number | undefined;
+  priceCrore?: number | undefined;
   address?: string | undefined;
   societyName?: string | undefined;
   locality?: string | undefined;
@@ -678,13 +765,109 @@ export interface EmbeddedPropertyEvent {
   embedding?: number[] | undefined;
 }
 
+function createBasePropertyFieldMetadata(): PropertyFieldMetadata {
+  return { naturalTone: "", label: "", category: 0 };
+}
+
+export const PropertyFieldMetadata: MessageFns<PropertyFieldMetadata> = {
+  encode(message: PropertyFieldMetadata, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.naturalTone !== undefined && message.naturalTone !== "") {
+      writer.uint32(10).string(message.naturalTone);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(18).string(message.label);
+    }
+    if (message.category !== undefined && message.category !== 0) {
+      writer.uint32(24).int32(message.category);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PropertyFieldMetadata {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePropertyFieldMetadata();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.naturalTone = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PropertyFieldMetadata {
+    return {
+      naturalTone: isSet(object.naturalTone)
+        ? globalThis.String(object.naturalTone)
+        : isSet(object.natural_tone)
+        ? globalThis.String(object.natural_tone)
+        : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      category: isSet(object.category) ? fieldCategoryFromJSON(object.category) : 0,
+    };
+  },
+
+  toJSON(message: PropertyFieldMetadata): unknown {
+    const obj: any = {};
+    if (message.naturalTone !== undefined && message.naturalTone !== "") {
+      obj.naturalTone = message.naturalTone;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.category !== undefined && message.category !== 0) {
+      obj.category = fieldCategoryToJSON(message.category);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PropertyFieldMetadata>, I>>(base?: I): PropertyFieldMetadata {
+    return PropertyFieldMetadata.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PropertyFieldMetadata>, I>>(object: I): PropertyFieldMetadata {
+    const message = createBasePropertyFieldMetadata();
+    message.naturalTone = object.naturalTone ?? "";
+    message.label = object.label ?? "";
+    message.category = object.category ?? 0;
+    return message;
+  },
+};
+
 function createBasePropertyIngestedEvent(): PropertyIngestedEvent {
   return {
     propertyId: "",
     city: "",
     pinCode: "",
     state: "",
-    priceCr: 0,
+    priceCrore: 0,
     address: undefined,
     societyName: undefined,
     locality: undefined,
@@ -799,8 +982,8 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
     if (message.state !== undefined && message.state !== "") {
       writer.uint32(58).string(message.state);
     }
-    if (message.priceCr !== undefined && message.priceCr !== 0) {
-      writer.uint32(97).double(message.priceCr);
+    if (message.priceCrore !== undefined && message.priceCrore !== 0) {
+      writer.uint32(97).double(message.priceCrore);
     }
     if (message.address !== undefined) {
       writer.uint32(818).string(message.address);
@@ -1140,7 +1323,7 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
             break;
           }
 
-          message.priceCr = reader.double();
+          message.priceCrore = reader.double();
           continue;
         }
         case 102: {
@@ -1942,10 +2125,10 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
         ? globalThis.String(object.pin_code)
         : "",
       state: isSet(object.state) ? globalThis.String(object.state) : "",
-      priceCr: isSet(object.priceCr)
-        ? globalThis.Number(object.priceCr)
-        : isSet(object.price_cr)
-        ? globalThis.Number(object.price_cr)
+      priceCrore: isSet(object.priceCrore)
+        ? globalThis.Number(object.priceCrore)
+        : isSet(object.price_crore)
+        ? globalThis.Number(object.price_crore)
         : 0,
       address: isSet(object.address) ? globalThis.String(object.address) : undefined,
       societyName: isSet(object.societyName)
@@ -2413,8 +2596,8 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
     if (message.state !== undefined && message.state !== "") {
       obj.state = message.state;
     }
-    if (message.priceCr !== undefined && message.priceCr !== 0) {
-      obj.priceCr = message.priceCr;
+    if (message.priceCrore !== undefined && message.priceCrore !== 0) {
+      obj.priceCrore = message.priceCrore;
     }
     if (message.address !== undefined) {
       obj.address = message.address;
@@ -2719,7 +2902,7 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
     message.city = object.city ?? "";
     message.pinCode = object.pinCode ?? "";
     message.state = object.state ?? "";
-    message.priceCr = object.priceCr ?? 0;
+    message.priceCrore = object.priceCrore ?? 0;
     message.address = object.address ?? undefined;
     message.societyName = object.societyName ?? undefined;
     message.locality = object.locality ?? undefined;

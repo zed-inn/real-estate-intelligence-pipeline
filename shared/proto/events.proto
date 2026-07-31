@@ -2,6 +2,31 @@ syntax = "proto3";
 
 package intelligence_events;
 
+import "google/protobuf/descriptor.proto";
+
+enum FieldCategory {
+  CATEGORY_UNSPECIFIED = 0;
+  CATEGORY_SKIP = 1;
+  CATEGORY_LOCATION = 2;
+  CATEGORY_PRICING = 3;
+  CATEGORY_SPEC = 4;
+  CATEGORY_AMENITY = 5;
+  CATEGORY_SECURITY = 6;
+  CATEGORY_PROXIMITY = 7;
+  CATEGORY_SCORE = 8;
+  CATEGORY_INFRASTRUCTURE = 9;
+}
+
+message PropertyFieldMetadata {
+  string natural_tone = 1;
+  string label = 2;
+  FieldCategory category = 3;
+}
+
+extend google.protobuf.FieldOptions {
+  optional PropertyFieldMetadata info = 50000;
+}
+
 enum PropertyType {
   APARTMENT = 0;
   VILLA = 1;
@@ -91,121 +116,122 @@ enum CityTier {
 }
 
 message PropertyIngestedEvent {
-  string property_id = 1;
-  string city = 4;
-  string pin_code = 6;
-  string state = 7;
-  double price_cr = 12;
-  
-  optional string address = 102; 
-  optional string society_name = 2;
-  optional string locality = 3;
-  optional CityTier city_tier = 5;
-  
-  optional double price_per_sqft = 13;
-  
-  optional int32 bhk = 22;
-  optional int32 carpet_area_sqft = 25;
-  optional PropertyType property_type = 32;
+  string property_id = 1 [(info) = { category: CATEGORY_SKIP }];
 
-  optional double latitude = 8;
-  optional double longitude = 9;
-  optional string zone = 10;
-  optional string landmark = 11;
-  
-  optional double maintenance_monthly = 14;
-  optional string maintenance_cycle = 15;
-  optional double property_tax_yearly = 16;
-  optional double stamp_duty_est = 17;
-  optional double registration_fees_est = 18;
-  optional double booking_amount = 19;
-  optional double expected_rental_yield = 20;
-  optional bool is_negotiable = 21;
-  
-  optional int32 bathrooms = 23;
-  optional int32 balconies = 24;
-  optional int32 super_built_up_area_sqft = 26;
-  optional int32 plot_area_sqft = 27;
-  optional double length_ft = 28;
-  optional double width_ft = 29;
-  optional int32 floor_number = 30;
-  optional int32 total_floors = 31;
-  
-  optional FacingDirection facing_direction = 33;
-  optional FurnishingStatus furnishing_status = 34;
-  optional WaterSupply water_supply = 35;
-  optional FlooringType flooring_type = 36; 
-  optional PossessionStatus possession_status = 37;
-  optional PowerBackup power_backup = 38;
-  optional OwnershipType ownership_type = 39;
-  optional ReraStatus rera_status = 40;
-  optional string khata_type = 41;
-  
-  optional bool has_pooja_room = 42;
-  optional bool has_servant_room = 43;
-  optional bool has_study_room = 44;
-  optional bool has_store_room = 45;
-  optional bool has_private_terrace = 46;
-  optional bool has_private_garden = 47;
-  optional bool has_basement = 48;
-  optional bool is_duplex = 49;
-  optional bool is_corner_plot = 50;
-  optional bool has_modular_kitchen = 51;
-  
-  optional int32 covered_parking_spots = 52;
-  optional int32 open_parking_spots = 53;
-  optional bool has_ev_charging = 54;
-  optional bool has_visitor_parking = 55;
-  optional int32 number_of_lifts = 56;
-  optional int32 service_lifts = 57;
-  optional bool has_stp = 58; 
-  optional bool has_rainwater_harvesting = 59;
-  optional bool has_solar_panels = 60;
-  optional bool has_piped_gas = 61;
-  
-  optional bool has_swimming_pool = 62;
-  optional bool has_gymnasium = 63;
-  optional bool has_clubhouse = 64;
-  optional bool has_kids_play_area = 65;
-  optional bool has_jogging_track = 66;
-  optional bool has_tennis_court = 67;
-  optional bool has_badminton_court = 68;
-  optional bool has_squash_court = 69;
-  optional bool has_indoor_games = 70;
-  optional bool has_mini_theatre = 71;
-  
-  optional bool has_pharmacy = 72;
-  optional bool has_atm = 73;
-  optional bool has_grocery_store = 74;
-  optional bool has_clinic = 75;
-  optional bool has_creche = 76;
-  optional bool has_salon = 77;
-  optional bool has_dog_park = 78;
-  optional bool has_library = 79;
-  optional bool has_banquet_hall = 80;
-  optional bool has_temple = 81;
-  
-  optional bool has_24x7_security = 82;
-  optional bool has_cctv = 83;
-  optional bool has_intercom = 84;
-  optional bool has_video_door_phone = 85;
-  optional bool has_biometric_access = 86;
-  optional bool has_fire_alarm = 87;
-  optional bool has_fire_extinguishers = 88;
-  optional bool is_gated_community = 89;
-  optional bool has_guard_room = 90;
-  optional bool has_boom_barrier = 91;
-  
-  optional double distance_metro_km = 92;
-  optional double distance_airport_km = 93;
-  optional double distance_hospital_km = 94;
-  optional double distance_school_km = 95;
-  optional double distance_mall_km = 96;
-  optional double distance_bus_stop_km = 97;
-  optional double walkability_score = 98; 
-  optional double safety_score = 99;
-  optional double livability_score = 100;
-  optional double green_cover_score = 101;
+  string city = 4 [(info) = { natural_tone: "located in ##", label: "City", category: CATEGORY_LOCATION }];
+  string pin_code = 6 [(info) = { natural_tone: "with pin code ##", label: "Pin Code", category: CATEGORY_LOCATION }];
+  string state = 7 [(info) = { natural_tone: "in the state of ##", label: "State", category: CATEGORY_LOCATION }];
+  double price_crore = 12 [(info) = { natural_tone: "priced at ## crores", label: "Price", category: CATEGORY_PRICING }];
+
+  optional string address = 102 [(info) = { natural_tone: "at address \"##\"", label: "Address", category: CATEGORY_LOCATION }];
+  optional string society_name = 2 [(info) = { natural_tone: "in ## society", label: "Society", category: CATEGORY_LOCATION }];
+  optional string locality = 3 [(info) = { natural_tone: "in ## locality", label: "Locality", category: CATEGORY_LOCATION }];
+  optional CityTier city_tier = 5 [(info) = { natural_tone: "a ## city", label: "City Tier", category: CATEGORY_LOCATION }];
+
+  optional double price_per_sqft = 13 [(info) = { natural_tone: "at ## per sqft", label: "Price/sqft", category: CATEGORY_PRICING }];
+
+  optional int32 bhk = 22 [(info) = { natural_tone: "a ## BHK", label: "BHK", category: CATEGORY_SPEC }];
+  optional int32 carpet_area_sqft = 25 [(info) = { natural_tone: "with a carpet area of ## sqft", label: "Carpet Area", category: CATEGORY_SPEC }];
+  optional PropertyType property_type = 32 [(info) = { natural_tone: "a ## property", label: "Property Type", category: CATEGORY_SPEC }];
+
+  optional double latitude = 8 [(info) = { category: CATEGORY_SKIP }];
+  optional double longitude = 9 [(info) = { category: CATEGORY_SKIP }];
+  optional string zone = 10 [(info) = { natural_tone: "in ## zone", label: "Zone", category: CATEGORY_LOCATION }];
+  optional string landmark = 11 [(info) = { natural_tone: "near ##", label: "Landmark", category: CATEGORY_LOCATION }];
+
+  optional double maintenance_monthly = 14 [(info) = { natural_tone: "with ## monthly maintenance", label: "Maintenance", category: CATEGORY_PRICING }];
+  optional string maintenance_cycle = 15 [(info) = { natural_tone: "maintenance cycle is ##", label: "Maintenance Cycle", category: CATEGORY_PRICING }];
+  optional double property_tax_yearly = 16 [(info) = { natural_tone: "yearly property tax of ##", label: "Property Tax", category: CATEGORY_PRICING }];
+  optional double stamp_duty_est = 17 [(info) = { natural_tone: "estimated stamp duty of ##", label: "Stamp Duty", category: CATEGORY_PRICING }];
+  optional double registration_fees_est = 18 [(info) = { natural_tone: "estimated registration fees of ##", label: "Registration Fees", category: CATEGORY_PRICING }];
+  optional double booking_amount = 19 [(info) = { natural_tone: "booking amount of ##", label: "Booking Amount", category: CATEGORY_PRICING }];
+  optional double expected_rental_yield = 20 [(info) = { natural_tone: "expected rental yield of ##%", label: "Rental Yield", category: CATEGORY_PRICING }];
+  optional bool is_negotiable = 21 [(info) = { natural_tone: "price is negotiable", label: "Negotiable", category: CATEGORY_SPEC }];
+
+  optional int32 bathrooms = 23 [(info) = { natural_tone: "with ## bathrooms", label: "Bathrooms", category: CATEGORY_SPEC }];
+  optional int32 balconies = 24 [(info) = { natural_tone: "## balconies", label: "Balconies", category: CATEGORY_SPEC }];
+  optional int32 super_built_up_area_sqft = 26 [(info) = { natural_tone: "super built-up area of ## sqft", label: "Super Built-Up Area", category: CATEGORY_SPEC }];
+  optional int32 plot_area_sqft = 27 [(info) = { natural_tone: "plot area of ## sqft", label: "Plot Area", category: CATEGORY_SPEC }];
+  optional double length_ft = 28 [(info) = { natural_tone: "## ft in length", label: "Length", category: CATEGORY_SPEC }];
+  optional double width_ft = 29 [(info) = { natural_tone: "## ft in width", label: "Width", category: CATEGORY_SPEC }];
+  optional int32 floor_number = 30 [(info) = { natural_tone: "on floor ##", label: "Floor", category: CATEGORY_SPEC }];
+  optional int32 total_floors = 31 [(info) = { natural_tone: "of ## total floors", label: "Total Floors", category: CATEGORY_SPEC }];
+
+  optional FacingDirection facing_direction = 33 [(info) = { natural_tone: "## facing", label: "Facing", category: CATEGORY_SPEC }];
+  optional FurnishingStatus furnishing_status = 34 [(info) = { natural_tone: "##", label: "Furnishing", category: CATEGORY_SPEC }];
+  optional WaterSupply water_supply = 35 [(info) = { natural_tone: "## water supply", label: "Water Supply", category: CATEGORY_INFRASTRUCTURE }];
+  optional FlooringType flooring_type = 36 [(info) = { natural_tone: "## flooring", label: "Flooring", category: CATEGORY_SPEC }];
+  optional PossessionStatus possession_status = 37 [(info) = { natural_tone: "##", label: "Possession", category: CATEGORY_SPEC }];
+  optional PowerBackup power_backup = 38 [(info) = { natural_tone: "## power backup", label: "Power Backup", category: CATEGORY_INFRASTRUCTURE }];
+  optional OwnershipType ownership_type = 39 [(info) = { natural_tone: "## ownership", label: "Ownership", category: CATEGORY_SPEC }];
+  optional ReraStatus rera_status = 40 [(info) = { natural_tone: "##", label: "RERA Status", category: CATEGORY_SPEC }];
+  optional string khata_type = 41 [(info) = { natural_tone: "## khata", label: "Khata Type", category: CATEGORY_SPEC }];
+
+  optional bool has_pooja_room = 42 [(info) = { natural_tone: "pooja room", label: "Pooja Room", category: CATEGORY_AMENITY }];
+  optional bool has_servant_room = 43 [(info) = { natural_tone: "servant room", label: "Servant Room", category: CATEGORY_AMENITY }];
+  optional bool has_study_room = 44 [(info) = { natural_tone: "study room", label: "Study Room", category: CATEGORY_AMENITY }];
+  optional bool has_store_room = 45 [(info) = { natural_tone: "store room", label: "Store Room", category: CATEGORY_AMENITY }];
+  optional bool has_private_terrace = 46 [(info) = { natural_tone: "private terrace", label: "Private Terrace", category: CATEGORY_AMENITY }];
+  optional bool has_private_garden = 47 [(info) = { natural_tone: "private garden", label: "Private Garden", category: CATEGORY_AMENITY }];
+  optional bool has_basement = 48 [(info) = { natural_tone: "basement", label: "Basement", category: CATEGORY_AMENITY }];
+  optional bool is_duplex = 49 [(info) = { natural_tone: "duplex layout", label: "Duplex", category: CATEGORY_SPEC }];
+  optional bool is_corner_plot = 50 [(info) = { natural_tone: "corner plot", label: "Corner Plot", category: CATEGORY_SPEC }];
+  optional bool has_modular_kitchen = 51 [(info) = { natural_tone: "modular kitchen", label: "Modular Kitchen", category: CATEGORY_AMENITY }];
+
+  optional int32 covered_parking_spots = 52 [(info) = { natural_tone: "## covered parking spots", label: "Covered Parking", category: CATEGORY_INFRASTRUCTURE }];
+  optional int32 open_parking_spots = 53 [(info) = { natural_tone: "## open parking spots", label: "Open Parking", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_ev_charging = 54 [(info) = { natural_tone: "EV charging", label: "EV Charging", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_visitor_parking = 55 [(info) = { natural_tone: "visitor parking", label: "Visitor Parking", category: CATEGORY_INFRASTRUCTURE }];
+  optional int32 number_of_lifts = 56 [(info) = { natural_tone: "## lifts", label: "Lifts", category: CATEGORY_INFRASTRUCTURE }];
+  optional int32 service_lifts = 57 [(info) = { natural_tone: "## service lifts", label: "Service Lifts", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_stp = 58 [(info) = { natural_tone: "sewage treatment plant", label: "STP", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_rainwater_harvesting = 59 [(info) = { natural_tone: "rainwater harvesting", label: "Rainwater Harvesting", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_solar_panels = 60 [(info) = { natural_tone: "solar panels", label: "Solar Panels", category: CATEGORY_INFRASTRUCTURE }];
+  optional bool has_piped_gas = 61 [(info) = { natural_tone: "piped gas", label: "Piped Gas", category: CATEGORY_INFRASTRUCTURE }];
+
+  optional bool has_swimming_pool = 62 [(info) = { natural_tone: "swimming pool", label: "Swimming Pool", category: CATEGORY_AMENITY }];
+  optional bool has_gymnasium = 63 [(info) = { natural_tone: "gymnasium", label: "Gymnasium", category: CATEGORY_AMENITY }];
+  optional bool has_clubhouse = 64 [(info) = { natural_tone: "clubhouse", label: "Clubhouse", category: CATEGORY_AMENITY }];
+  optional bool has_kids_play_area = 65 [(info) = { natural_tone: "kids play area", label: "Kids Play Area", category: CATEGORY_AMENITY }];
+  optional bool has_jogging_track = 66 [(info) = { natural_tone: "jogging track", label: "Jogging Track", category: CATEGORY_AMENITY }];
+  optional bool has_tennis_court = 67 [(info) = { natural_tone: "tennis court", label: "Tennis Court", category: CATEGORY_AMENITY }];
+  optional bool has_badminton_court = 68 [(info) = { natural_tone: "badminton court", label: "Badminton Court", category: CATEGORY_AMENITY }];
+  optional bool has_squash_court = 69 [(info) = { natural_tone: "squash court", label: "Squash Court", category: CATEGORY_AMENITY }];
+  optional bool has_indoor_games = 70 [(info) = { natural_tone: "indoor games", label: "Indoor Games", category: CATEGORY_AMENITY }];
+  optional bool has_mini_theatre = 71 [(info) = { natural_tone: "mini theatre", label: "Mini Theatre", category: CATEGORY_AMENITY }];
+
+  optional bool has_pharmacy = 72 [(info) = { natural_tone: "pharmacy", label: "Pharmacy", category: CATEGORY_AMENITY }];
+  optional bool has_atm = 73 [(info) = { natural_tone: "ATM", label: "ATM", category: CATEGORY_AMENITY }];
+  optional bool has_grocery_store = 74 [(info) = { natural_tone: "grocery store", label: "Grocery Store", category: CATEGORY_AMENITY }];
+  optional bool has_clinic = 75 [(info) = { natural_tone: "clinic", label: "Clinic", category: CATEGORY_AMENITY }];
+  optional bool has_creche = 76 [(info) = { natural_tone: "creche", label: "Creche", category: CATEGORY_AMENITY }];
+  optional bool has_salon = 77 [(info) = { natural_tone: "salon", label: "Salon", category: CATEGORY_AMENITY }];
+  optional bool has_dog_park = 78 [(info) = { natural_tone: "dog park", label: "Dog Park", category: CATEGORY_AMENITY }];
+  optional bool has_library = 79 [(info) = { natural_tone: "library", label: "Library", category: CATEGORY_AMENITY }];
+  optional bool has_banquet_hall = 80 [(info) = { natural_tone: "banquet hall", label: "Banquet Hall", category: CATEGORY_AMENITY }];
+  optional bool has_temple = 81 [(info) = { natural_tone: "temple", label: "Temple", category: CATEGORY_AMENITY }];
+
+  optional bool has_24x7_security = 82 [(info) = { natural_tone: "24x7 security", label: "24x7 Security", category: CATEGORY_SECURITY }];
+  optional bool has_cctv = 83 [(info) = { natural_tone: "CCTV surveillance", label: "CCTV", category: CATEGORY_SECURITY }];
+  optional bool has_intercom = 84 [(info) = { natural_tone: "intercom", label: "Intercom", category: CATEGORY_SECURITY }];
+  optional bool has_video_door_phone = 85 [(info) = { natural_tone: "video door phone", label: "Video Door Phone", category: CATEGORY_SECURITY }];
+  optional bool has_biometric_access = 86 [(info) = { natural_tone: "biometric access", label: "Biometric Access", category: CATEGORY_SECURITY }];
+  optional bool has_fire_alarm = 87 [(info) = { natural_tone: "fire alarm", label: "Fire Alarm", category: CATEGORY_SECURITY }];
+  optional bool has_fire_extinguishers = 88 [(info) = { natural_tone: "fire extinguishers", label: "Fire Extinguishers", category: CATEGORY_SECURITY }];
+  optional bool is_gated_community = 89 [(info) = { natural_tone: "gated community", label: "Gated Community", category: CATEGORY_SECURITY }];
+  optional bool has_guard_room = 90 [(info) = { natural_tone: "guard room", label: "Guard Room", category: CATEGORY_SECURITY }];
+  optional bool has_boom_barrier = 91 [(info) = { natural_tone: "boom barrier", label: "Boom Barrier", category: CATEGORY_SECURITY }];
+
+  optional double distance_metro_km = 92 [(info) = { natural_tone: "## km from the nearest metro", label: "Metro Distance", category: CATEGORY_PROXIMITY }];
+  optional double distance_airport_km = 93 [(info) = { natural_tone: "## km from the airport", label: "Airport Distance", category: CATEGORY_PROXIMITY }];
+  optional double distance_hospital_km = 94 [(info) = { natural_tone: "## km from the nearest hospital", label: "Hospital Distance", category: CATEGORY_PROXIMITY }];
+  optional double distance_school_km = 95 [(info) = { natural_tone: "## km from the nearest school", label: "School Distance", category: CATEGORY_PROXIMITY }];
+  optional double distance_mall_km = 96 [(info) = { natural_tone: "## km from the nearest mall", label: "Mall Distance", category: CATEGORY_PROXIMITY }];
+  optional double distance_bus_stop_km = 97 [(info) = { natural_tone: "## km from the nearest bus stop", label: "Bus Stop Distance", category: CATEGORY_PROXIMITY }];
+  optional double walkability_score = 98 [(info) = { natural_tone: "a walkability score of ##", label: "Walkability", category: CATEGORY_SCORE }];
+  optional double safety_score = 99 [(info) = { natural_tone: "a safety score of ##", label: "Safety", category: CATEGORY_SCORE }];
+  optional double livability_score = 100 [(info) = { natural_tone: "a livability score of ##", label: "Livability", category: CATEGORY_SCORE }];
+  optional double green_cover_score = 101 [(info) = { natural_tone: "a green cover score of ##", label: "Green Cover", category: CATEGORY_SCORE }];
 }
 
 message EmbeddedPropertyEvent {

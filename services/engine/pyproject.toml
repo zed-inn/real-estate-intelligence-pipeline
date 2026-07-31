@@ -12,5 +12,6 @@ dependencies = [
     "ollama>=0.6.2",
     "psycopg[binary]>=3.3.4",
     "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
     "sentence-transformers>=5.6.1",
 ]

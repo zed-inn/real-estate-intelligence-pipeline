@@ -1,8 +1,9 @@
 import logging
 from src.config import settings
 from src.kafka.client import get_kafka_consumer, get_kafka_producer
-from src.ml.embedder import build_intelligence_context, generate_embedding
-from generated.intelligence_events import PropertyIngestedEvent, EmbeddedPropertyEvent
+from src.ml.embedder import generate_embedding
+from src.ml.context_builder import build_intelligence_context
+from gen.events_pb import PropertyIngestedEvent, EmbeddedPropertyEvent
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ def main():
                 continue
             
             try:
-                payload = PropertyIngestedEvent().parse(msg.value())
+                payload = PropertyIngestedEvent.from_binary(msg.value())
                 
                 context = build_intelligence_context(payload)
                 embedding = generate_embedding(context)
@@ -39,7 +40,7 @@ def main():
                 producer.produce(
                     topic='property.embedded',
                     key=payload.property_id.encode('utf-8'),
-                    value=bytes(embedded_event)
+                    value=embedded_event.to_binary()
                 )
                 
                 producer.flush() 

@@ -4,7 +4,10 @@
 # This file has been @generated
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import (
+    List,
+    Optional,
+)
 
 import betterproto
 
@@ -209,3 +212,10 @@ class PropertyIngestedEvent(betterproto.Message):
     safety_score: Optional[float] = betterproto.double_field(99, optional=True)
     livability_score: Optional[float] = betterproto.double_field(100, optional=True)
     green_cover_score: Optional[float] = betterproto.double_field(101, optional=True)
+
+
+@dataclass(eq=False, repr=False)
+class EmbeddedPropertyEvent(betterproto.Message):
+    property_id: str = betterproto.string_field(1)
+    intelligence_context: str = betterproto.string_field(2)
+    embedding: List[float] = betterproto.float_field(3)

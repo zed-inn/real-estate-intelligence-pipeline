@@ -672,6 +672,12 @@ export interface PropertyIngestedEvent {
   greenCoverScore?: number | undefined;
 }
 
+export interface EmbeddedPropertyEvent {
+  propertyId?: string | undefined;
+  intelligenceContext?: string | undefined;
+  embedding?: number[] | undefined;
+}
+
 function createBasePropertyIngestedEvent(): PropertyIngestedEvent {
   return {
     propertyId: "",
@@ -2811,6 +2817,122 @@ export const PropertyIngestedEvent: MessageFns<PropertyIngestedEvent> = {
     message.safetyScore = object.safetyScore ?? undefined;
     message.livabilityScore = object.livabilityScore ?? undefined;
     message.greenCoverScore = object.greenCoverScore ?? undefined;
+    return message;
+  },
+};
+
+function createBaseEmbeddedPropertyEvent(): EmbeddedPropertyEvent {
+  return { propertyId: "", intelligenceContext: "", embedding: [] };
+}
+
+export const EmbeddedPropertyEvent: MessageFns<EmbeddedPropertyEvent> = {
+  encode(message: EmbeddedPropertyEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.propertyId !== undefined && message.propertyId !== "") {
+      writer.uint32(10).string(message.propertyId);
+    }
+    if (message.intelligenceContext !== undefined && message.intelligenceContext !== "") {
+      writer.uint32(18).string(message.intelligenceContext);
+    }
+    if (message.embedding !== undefined && message.embedding.length !== 0) {
+      writer.uint32(26).fork();
+      for (const v of message.embedding) {
+        writer.float(v);
+      }
+      writer.join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): EmbeddedPropertyEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEmbeddedPropertyEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.propertyId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.intelligenceContext = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag === 29) {
+            message.embedding!.push(reader.float());
+
+            continue;
+          }
+
+          if (tag === 26) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.embedding!.push(reader.float());
+            }
+
+            continue;
+          }
+
+          break;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EmbeddedPropertyEvent {
+    return {
+      propertyId: isSet(object.propertyId)
+        ? globalThis.String(object.propertyId)
+        : isSet(object.property_id)
+        ? globalThis.String(object.property_id)
+        : "",
+      intelligenceContext: isSet(object.intelligenceContext)
+        ? globalThis.String(object.intelligenceContext)
+        : isSet(object.intelligence_context)
+        ? globalThis.String(object.intelligence_context)
+        : "",
+      embedding: globalThis.Array.isArray(object?.embedding)
+        ? object.embedding.map((e: any) => globalThis.Number(e))
+        : [],
+    };
+  },
+
+  toJSON(message: EmbeddedPropertyEvent): unknown {
+    const obj: any = {};
+    if (message.propertyId !== undefined && message.propertyId !== "") {
+      obj.propertyId = message.propertyId;
+    }
+    if (message.intelligenceContext !== undefined && message.intelligenceContext !== "") {
+      obj.intelligenceContext = message.intelligenceContext;
+    }
+    if (message.embedding?.length) {
+      obj.embedding = message.embedding;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EmbeddedPropertyEvent>, I>>(base?: I): EmbeddedPropertyEvent {
+    return EmbeddedPropertyEvent.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<EmbeddedPropertyEvent>, I>>(object: I): EmbeddedPropertyEvent {
+    const message = createBaseEmbeddedPropertyEvent();
+    message.propertyId = object.propertyId ?? "";
+    message.intelligenceContext = object.intelligenceContext ?? "";
+    message.embedding = object.embedding?.map((e) => e) || [];
     return message;
   },
 };

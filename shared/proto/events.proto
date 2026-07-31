@@ -207,3 +207,9 @@ message PropertyIngestedEvent {
   optional double livability_score = 100;
   optional double green_cover_score = 101;
 }
+
+message EmbeddedPropertyEvent {
+  string property_id = 1;
+  string intelligence_context = 2;
+  repeated float embedding = 3;
+}

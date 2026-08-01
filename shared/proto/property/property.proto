@@ -1,0 +1,256 @@
+syntax = "proto3";
+
+package property;
+
+import "google/protobuf/descriptor.proto";
+
+/* Metadata for the property attribute fields */
+
+enum FieldSection {
+  SECTION_SKIP = 0;
+  SECTION_LOCATION = 1;
+  SECTION_PRICING = 2;
+  SECTION_INDIVIUAL_CONFIG = 3;
+  SECTION_SPEC = 4;
+  SECTION_SPEC_FLOOR = 5;
+  SECTION_AMENITY = 6;
+  SECTION_SECURITY = 7;
+  SECTION_PROXIMITY = 8;
+  SECTION_SCORE = 9;
+  SECTION_INFRASTRUCTURE = 10;
+}
+
+message PropertyFieldMetadata {
+  string label = 1;
+  optional string template = 2;
+  optional bool searchable = 3;
+  optional FieldSection section = 4;
+}
+
+message PropertyFieldValidation {
+  optional int32 min = 1;
+  optional int32 max = 2;
+}
+
+extend google.protobuf.FieldOptions {
+  optional PropertyFieldMetadata info = 50000;
+  optional PropertyFieldValidation validation = 50001;
+}
+
+
+/* Enums for the property fields */
+
+enum PropertyType {
+  APARTMENT = 0;
+  VILLA = 1;
+  INDEPENDENT_HOUSE = 2;
+  BUILDER_FLOOR = 3;
+  PENTHOUSE = 4;
+  STUDIO_APARTMENT = 5;
+  DUPLEX = 6;
+  TRIPLEX = 7;
+  FARM_HOUSE = 8;
+  AGRICULTURAL_LAND = 9;
+  RESIDENTIAL_PLOT = 10;
+  COMMERCIAL_OFFICE = 11;
+  RETAIL_SHOP = 12;
+  SERVICED_APARTMENT = 13;
+  CO_WORKING_SPACE = 14;
+}
+
+enum FacingDirection {
+  NORTH = 0;
+  EAST = 1;
+  NORTH_EAST = 2;
+  SOUTH = 3;
+  WEST = 4;
+  NORTH_WEST = 5;
+  SOUTH_EAST = 6;
+  SOUTH_WEST = 7;
+}
+
+enum FurnishingStatus {
+  UNFURNISHED = 0;
+  SEMI_FURNISHED = 1;
+  FULLY_FURNISHED = 2;
+  BARE_SHELL = 3;
+  WARM_SHELL = 4;
+  CUSTOM_FURNISHED = 5;
+}
+
+enum WaterSupply {
+  MUNICIPAL = 0;
+  BOREWELL = 1;
+  MUNICIPAL_AND_BOREWELL = 2;
+  WATER_TANKER = 3;
+  RO_PLANT = 4;
+  TREATED_WATER = 5;
+  GRAM_PANCHAYAT = 6;
+}
+
+enum PossessionStatus {
+  READY_TO_MOVE = 0;
+  UNDER_CONSTRUCTION = 1;
+  NEW_LAUNCH = 2;
+}
+
+enum PowerBackup {
+  NONE = 0;
+  PARTIAL = 1;
+  FULL_24X7 = 2;
+}
+
+enum OwnershipType {
+  FREEHOLD = 0;
+  LEASEHOLD = 1;
+  CO_OPERATIVE_SOCIETY = 2;
+  POWER_OF_ATTORNEY = 3;
+}
+
+enum ReraStatus {
+  RERA_APPROVED = 0;
+  RERA_PENDING = 1;
+  NOT_APPLICABLE = 2;
+}
+
+enum FlooringType {
+  VITRIFIED = 0;
+  MARBLE = 1;
+  WOODEN = 2;
+  GRANITE = 3;
+  MOSAIC = 4;
+  CEMENT = 5;
+}
+
+enum CityTier {
+  TIER_1 = 0;
+  TIER_2 = 1;
+  TIER_3 = 2;
+}
+
+
+message Property {
+  // Location
+  string city = 1 [(info) = { template: "located in ##", label: "City", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  string state = 3 [(info) = { template: "in the state of ##", label: "State", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  uint32 pin_code = 2 [(info) = { template: "with pin code ##", label: "Pin Code", section: SECTION_LOCATION }, (validation) = { min: 100000, max: 999999 }];
+  optional string address = 4 [(info) = { template: "at address \"##\"", label: "Address", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  optional string society_name = 5 [(info) = { template: "in ## society", label: "Society", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  optional string locality = 6 [(info) = { template: "in ## locality", label: "Locality", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  optional CityTier city_tier = 7 [(info) = { template: "a ## city", label: "City Tier", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  optional string zone = 8 [(info) = { template: "in ## zone", label: "Zone", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+  optional string landmark = 9 [(info) = { template: "near ##", label: "Landmark", section: SECTION_LOCATION }, (validation) = { min: 1 }];
+
+  // Coordinates
+  optional double latitude_degrees = 10 [(info) = { section: SECTION_SKIP }, (validation) = { min: -90, max: 90 }];
+  optional double longitude_degrees = 11 [(info) = { section: SECTION_SKIP }, (validation) = { min: -180, max: 180 }];
+
+  // Pricing
+  double price_crore = 12 [(info) = { template: "priced at ## crores", label: "Price in Crores", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional bool is_negotiable = 13 [(info) = { template: "where price is negotiable", label: "Negotiable", section: SECTION_PRICING }];
+  optional double price_rs_per_sqft = 14 [(info) = { template: "at rs. ## per sqft", label: "Price/sqft in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional double maintenance_monthly_rs = 15 [(info) = { template: "with rs. ## monthly maintenance", label: "Maintenance in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional uint32 maintenance_cycle_months = 16 [(info) = { template: "maintenance cycle at ## months", label: "Maintenance Cycle in Months", section: SECTION_PRICING }, (validation) = {min: 0, max: 24}];
+  optional double property_tax_yearly_rs = 17 [(info) = { template: "yearly property tax of rs. ##", label: "Property Tax in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional double stamp_duty_est_rs = 18 [(info) = { template: "estimated stamp duty of rs. ##", label: "Stamp Duty in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional double registration_fees_est_rs = 19 [(info) = { template: "estimated registration fees of rs. ##", label: "Registration Fees in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional double booking_amount_rs = 20 [(info) = { template: "booking amount of rs. ##", label: "Booking Amount in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
+  optional double expected_rental_yield_percent = 21 [(info) = { template: "expected rental yield of ##%", label: "Rental Yield in Percent", section: SECTION_PRICING }, (validation) = {min: 0, max: 100}];
+
+  // Bhk and Property type
+  optional uint32 bhk = 22 [(info) = { template: "This is a ## bhk property.", label: "BHK", section: SECTION_INDIVIUAL_CONFIG }, (validation) = {min: 1, max: 10}];
+  optional PropertyType property_type = 23 [(info) = { template: "It's a ##.", label: "Property Type", section: SECTION_INDIVIUAL_CONFIG }];
+
+  // Floor details
+  optional uint32 floor_number = 31 [(info) = { template: "It's on floor ##", label: "Floor", section: SECTION_SPEC_FLOOR }, (validation) = {min: 1}];
+  optional uint32 total_floors = 32 [(info) = { template: "of ## total floors", label: "Total Floors", section: SECTION_SPEC_FLOOR }, (validation) = {min: 1}];
+
+  // Specification
+  optional uint32 carpet_area_sqft = 24 [(info) = { template: "a carpet area of ## sqft", label: "Carpet Area in Sqft", section: SECTION_SPEC }, (validation) = {min: 0}];
+  optional uint32 bathrooms = 25 [(info) = { template: "## bathrooms", label: "Number of Bathrooms", section: SECTION_SPEC }, (validation) = {min: 0}];
+  optional uint32 balconies = 26 [(info) = { template: "## balconies", label: "Number of Balconies", section: SECTION_SPEC }, (validation) = {min: 0}];
+  optional uint32 super_built_up_area_sqft = 27 [(info) = { template: "super built-up area of ## sqft", label: "Super Built-Up Area in Sqft", section: SECTION_SPEC }, (validation) = {min: 0}];
+  optional uint32 plot_area_sqft = 28 [(info) = { template: "plot area of ## sqft", label: "Plot Area in Sqft", section: SECTION_SPEC }, (validation) = {min: 0}];
+  optional FacingDirection facing_direction = 33 [(info) = { template: "## facing", label: "Facing Direction", section: SECTION_SPEC }];
+  optional FurnishingStatus furnishing_status = 34 [(info) = { template: "##", label: "Furnishing Status", section: SECTION_SPEC }];
+  optional FlooringType flooring_type = 35 [(info) = { template: "## flooring", label: "Flooring Type", section: SECTION_SPEC }];
+  optional PossessionStatus possession_status = 36 [(info) = { template: "##", label: "Possession Status", section: SECTION_SPEC }];
+  optional OwnershipType ownership_type = 39 [(info) = { template: "## ownership", label: "Ownership Type", section: SECTION_SPEC }];
+  optional ReraStatus rera_status = 37 [(info) = { template: "##", label: "RERA Status", section: SECTION_SPEC }];
+  optional string khata_type = 38 [(info) = { template: "## khata", label: "Khata Type", section: SECTION_SPEC }];
+
+  // Duplex and Corner plot
+  optional bool is_duplex = 40 [(info) = { template: "This is a duplex property.", label: "Duplex", section: SECTION_INDIVIUAL_CONFIG }];
+  optional bool is_corner_plot = 41 [(info) = { template: "The property sits on a corner plot.", label: "Corner Plot", section: SECTION_INDIVIUAL_CONFIG }];
+  
+  // Infrastructure
+  optional WaterSupply water_supply = 42 [(info) = { template: "## water supply", label: "Water Supply", section: SECTION_INFRASTRUCTURE }];
+  optional PowerBackup power_backup = 43 [(info) = { template: "## power backup", label: "Power Backup", section: SECTION_INFRASTRUCTURE }];
+  optional uint32 covered_parking_spots = 44 [(info) = { template: "## covered parking spots", label: "Covered Parking", section: SECTION_INFRASTRUCTURE }, (validation) = {min: 0}];
+  optional uint32 open_parking_spots = 45 [(info) = { template: "## open parking spots", label: "Open Parking", section: SECTION_INFRASTRUCTURE }, (validation) = {min: 0}];
+  optional bool has_ev_charging = 46 [(info) = { template: "EV charging", label: "EV Charging", section: SECTION_INFRASTRUCTURE }];
+  optional bool has_visitor_parking = 47 [(info) = { template: "visitor parking", label: "Visitor Parking", section: SECTION_INFRASTRUCTURE }];
+  optional uint32 number_of_lifts = 48 [(info) = { template: "## lifts", label: "Lifts", section: SECTION_INFRASTRUCTURE }, (validation) = {min: 0}];
+  optional uint32 service_lifts = 49 [(info) = { template: "## service lifts", label: "Service Lifts", section: SECTION_INFRASTRUCTURE }, (validation) = {min: 0}];
+  optional bool has_stp = 50 [(info) = { template: "sewage treatment plant", label: "STP", section: SECTION_INFRASTRUCTURE }];
+  optional bool has_rainwater_harvesting = 51 [(info) = { template: "rainwater harvesting", label: "Rainwater Harvesting", section: SECTION_INFRASTRUCTURE }];
+  optional bool has_solar_panels = 52 [(info) = { template: "solar panels", label: "Solar Panels", section: SECTION_INFRASTRUCTURE }];
+  optional bool has_piped_gas = 53 [(info) = { template: "piped gas", label: "Piped Gas", section: SECTION_INFRASTRUCTURE }];
+  
+  // Amenities
+  optional bool has_pooja_room = 54 [(info) = { template: "pooja room", label: "Pooja Room", section: SECTION_AMENITY }];
+  optional bool has_servant_room = 55 [(info) = { template: "servant room", label: "Servant Room", section: SECTION_AMENITY }];
+  optional bool has_study_room = 56 [(info) = { template: "study room", label: "Study Room", section: SECTION_AMENITY }];
+  optional bool has_store_room = 57 [(info) = { template: "store room", label: "Store Room", section: SECTION_AMENITY }];
+  optional bool has_private_terrace = 58 [(info) = { template: "private terrace", label: "Private Terrace", section: SECTION_AMENITY }];
+  optional bool has_private_garden = 59 [(info) = { template: "private garden", label: "Private Garden", section: SECTION_AMENITY }];
+  optional bool has_basement = 60 [(info) = { template: "basement", label: "Basement", section: SECTION_AMENITY }];
+  optional bool has_modular_kitchen = 61 [(info) = { template: "modular kitchen", label: "Modular Kitchen", section: SECTION_AMENITY }];
+  optional bool has_swimming_pool = 62 [(info) = { template: "swimming pool", label: "Swimming Pool", section: SECTION_AMENITY }];
+  optional bool has_gymnasium = 63 [(info) = { template: "gymnasium", label: "Gymnasium", section: SECTION_AMENITY }];
+  optional bool has_clubhouse = 64 [(info) = { template: "clubhouse", label: "Clubhouse", section: SECTION_AMENITY }];
+  optional bool has_kids_play_area = 65 [(info) = { template: "kids play area", label: "Kids Play Area", section: SECTION_AMENITY }];
+  optional bool has_jogging_track = 66 [(info) = { template: "jogging track", label: "Jogging Track", section: SECTION_AMENITY }];
+  optional bool has_tennis_court = 67 [(info) = { template: "tennis court", label: "Tennis Court", section: SECTION_AMENITY }];
+  optional bool has_badminton_court = 68 [(info) = { template: "badminton court", label: "Badminton Court", section: SECTION_AMENITY }];
+  optional bool has_squash_court = 69 [(info) = { template: "squash court", label: "Squash Court", section: SECTION_AMENITY }];
+  optional bool has_indoor_games = 70 [(info) = { template: "indoor games", label: "Indoor Games", section: SECTION_AMENITY }];
+  optional bool has_mini_theatre = 71 [(info) = { template: "mini theatre", label: "Mini Theatre", section: SECTION_AMENITY }];
+  optional bool has_pharmacy = 72 [(info) = { template: "pharmacy", label: "Pharmacy", section: SECTION_AMENITY }];
+  optional bool has_atm = 73 [(info) = { template: "ATM", label: "ATM", section: SECTION_AMENITY }];
+  optional bool has_grocery_store = 74 [(info) = { template: "grocery store", label: "Grocery Store", section: SECTION_AMENITY }];
+  optional bool has_clinic = 75 [(info) = { template: "clinic", label: "Clinic", section: SECTION_AMENITY }];
+  optional bool has_creche = 76 [(info) = { template: "creche", label: "Creche", section: SECTION_AMENITY }];
+  optional bool has_salon = 77 [(info) = { template: "salon", label: "Salon", section: SECTION_AMENITY }];
+  optional bool has_dog_park = 78 [(info) = { template: "dog park", label: "Dog Park", section: SECTION_AMENITY }];
+  optional bool has_library = 79 [(info) = { template: "library", label: "Library", section: SECTION_AMENITY }];
+  optional bool has_banquet_hall = 80 [(info) = { template: "banquet hall", label: "Banquet Hall", section: SECTION_AMENITY }];
+  optional bool has_temple = 81 [(info) = { template: "temple", label: "Temple", section: SECTION_AMENITY }];
+
+  // Security
+  optional bool has_24x7_security = 82 [(info) = { template: "24x7 security", label: "24x7 Security", section: SECTION_SECURITY }];
+  optional bool has_cctv = 83 [(info) = { template: "CCTV surveillance", label: "CCTV", section: SECTION_SECURITY }];
+  optional bool has_intercom = 84 [(info) = { template: "intercom", label: "Intercom", section: SECTION_SECURITY }];
+  optional bool has_video_door_phone = 85 [(info) = { template: "video door phone", label: "Video Door Phone", section: SECTION_SECURITY }];
+  optional bool has_biometric_access = 86 [(info) = { template: "biometric access", label: "Biometric Access", section: SECTION_SECURITY }];
+  optional bool has_fire_alarm = 87 [(info) = { template: "fire alarm", label: "Fire Alarm", section: SECTION_SECURITY }];
+  optional bool has_fire_extinguishers = 88 [(info) = { template: "fire extinguishers", label: "Fire Extinguishers", section: SECTION_SECURITY }];
+  optional bool is_gated_community = 89 [(info) = { template: "gated community", label: "Gated Community", section: SECTION_SECURITY }];
+  optional bool has_guard_room = 90 [(info) = { template: "guard room", label: "Guard Room", section: SECTION_SECURITY }];
+  optional bool has_boom_barrier = 91 [(info) = { template: "boom barrier", label: "Boom Barrier", section: SECTION_SECURITY }];
+
+  // Proximity
+  optional double distance_metro_km = 92 [(info) = { template: "## km from the nearest metro", label: "Metro Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+  optional double distance_airport_km = 93 [(info) = { template: "## km from the airport", label: "Airport Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+  optional double distance_hospital_km = 94 [(info) = { template: "## km from the nearest hospital", label: "Hospital Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+  optional double distance_school_km = 95 [(info) = { template: "## km from the nearest school", label: "School Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+  optional double distance_mall_km = 96 [(info) = { template: "## km from the nearest mall", label: "Mall Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+  optional double distance_bus_stop_km = 97 [(info) = { template: "## km from the nearest bus stop", label: "Bus Stop Distance in Km", section: SECTION_PROXIMITY }, (validation) = {min: 0}];
+
+  // Score
+  optional double walkability_score = 98 [(info) = { template: "a walkability score of ## out of 10", label: "Walkability Score out of 10", section: SECTION_SCORE }, (validation) = {min: 0, max: 10}];
+  optional double safety_score = 99 [(info) = { template: "a safety score of ## out of 10", label: "Safety Score out of 10", section: SECTION_SCORE }, (validation) = {min: 0, max: 10}];
+  optional double livability_score = 100 [(info) = { template: "a livability score of ## out of 10", label: "Livability Score out of 10", section: SECTION_SCORE }, (validation) = {min: 0, max: 10}];
+  optional double green_cover_score = 101 [(info) = { template: "a green cover score of ## out of 10", label: "Green Cover Score out of 10", section: SECTION_SCORE }, (validation) = {min: 0, max: 10}];
+}
+

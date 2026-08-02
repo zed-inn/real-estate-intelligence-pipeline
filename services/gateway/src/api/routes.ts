@@ -1,54 +1,53 @@
-import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { IngestPropertySchema } from '@/schemas/api.js';
-import { db } from '@/db/index.js';
-import { properties, outbox } from '@/db/schema.js';
-import { KAFKA_TOPICS } from '@/constants/index.js';
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import {
+  PropertySchema,
+  PropertySearchableSchema,
+} from "@/api/schemas/property";
+import {
+  DbPropertySchema,
+  DbPropertyInsertSchema,
+  outbox,
+  properties,
+} from "@/db/schema";
+import { db } from "@/db";
+import { KAFKA_TOPICS } from "@/config/constants";
 
 export const propertyRoutes: FastifyPluginAsyncZod = async (fastify) => {
-
   fastify.post(
-    '/ingest',
-    { schema: { body: IngestPropertySchema } },
+    "/ingest",
+    { schema: { body: PropertySchema } },
     async (request, reply) => {
-      const data = request.body;
+      const body = request.body;
 
-      const {
-        city, pin_code, price_cr,
-        locality, society_name, price_per_sqft,
-        bhk, carpet_area_sqft, property_type,
-        ...sparseFeatures
-      } = data;
+      const searchableFields = PropertySearchableSchema.parse(body);
+      const rawFeatures: Record<string, unknown> = {};
 
-      let generatedPropertyId: string = '';
+      for (const [key, value] of Object.entries(body))
+        if (!Object.hasOwn(searchableFields, key)) rawFeatures[key] = value;
 
-      await db.transaction(async (tx) => {
-        const [newProp] = await tx.insert(properties).values({
-          city,
-          locality: locality ?? null,
-          societyName: society_name ?? null,
-          pinCode: pin_code,
-          priceCr: price_cr.toString(),
-          pricePerSqft: price_per_sqft?.toString() ?? null,
-          bhk: bhk ?? null,
-          carpetAreaSqft: carpet_area_sqft ?? null,
-          propertyType: property_type?.toString() ?? null,
+      const generatedId = await db.transaction(async (tx) => {
+        const dbInsertPayload = DbPropertyInsertSchema.parse(searchableFields);
 
-          rawFeatures: sparseFeatures
-        }).returning();
+        const [newProp] = await tx
+          .insert(properties)
+          .values({
+            ...dbInsertPayload,
+            rawFeatures,
+          })
+          .returning();
 
-        generatedPropertyId = newProp.id;
+        const propInserted = DbPropertySchema.parse(newProp);
 
         await tx.insert(outbox).values({
           topic: KAFKA_TOPICS.PROPERTY_INGESTED,
-          payload: JSON.stringify(newProp),
+          payload: JSON.stringify(propInserted),
         });
+
+        return propInserted.id;
       });
 
-      return reply.status(201).send({
-        success: true,
-        message: 'property ingested',
-        property_id: generatedPropertyId
-      });
-    }
+      reply.statusCode = 201;
+      return { success: true, property_id: generatedId };
+    },
   );
 };

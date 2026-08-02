@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package real_estate;
+
+enum PropertyType {
+  APARTMENT = 0;
+  VILLA = 1;
+  INDEPENDENT_HOUSE = 2;
+  BUILDER_FLOOR = 3;
+  PENTHOUSE = 4;
+  STUDIO_APARTMENT = 5;
+  DUPLEX = 6;
+  TRIPLEX = 7;
+  FARM_HOUSE = 8;
+  AGRICULTURAL_LAND = 9;
+  RESIDENTIAL_PLOT = 10;
+  COMMERCIAL_OFFICE = 11;
+  RETAIL_SHOP = 12;
+  SERVICED_APARTMENT = 13;
+  CO_WORKING_SPACE = 14;
+}
+
+enum FacingDirection {
+  NORTH = 0;
+  EAST = 1;
+  NORTH_EAST = 2;
+  SOUTH = 3;
+  WEST = 4;
+  NORTH_WEST = 5;
+  SOUTH_EAST = 6;
+  SOUTH_WEST = 7;
+}
+
+enum FurnishingStatus {
+  UNFURNISHED = 0;
+  SEMI_FURNISHED = 1;
+  FULLY_FURNISHED = 2;
+  BARE_SHELL = 3;
+  WARM_SHELL = 4;
+  CUSTOM_FURNISHED = 5;
+}
+
+enum WaterSupply {
+  MUNICIPAL = 0;
+  BOREWELL = 1;
+  MUNICIPAL_AND_BOREWELL = 2;
+  WATER_TANKER = 3;
+  RO_PLANT = 4;
+  TREATED_WATER = 5;
+  GRAM_PANCHAYAT = 6;
+}
+
+enum PossessionStatus {
+  READY_TO_MOVE = 0;
+  UNDER_CONSTRUCTION = 1;
+  NEW_LAUNCH = 2;
+}
+
+enum PowerBackup {
+  NONE = 0;
+  PARTIAL = 1;
+  FULL_24X7 = 2;
+}
+
+enum OwnershipType {
+  FREEHOLD = 0;
+  LEASEHOLD = 1;
+  CO_OPERATIVE_SOCIETY = 2;
+  POWER_OF_ATTORNEY = 3;
+}
+
+enum ReraStatus {
+  RERA_APPROVED = 0;
+  RERA_PENDING = 1;
+  NOT_APPLICABLE = 2;
+}
+
+enum FlooringType {
+  VITRIFIED = 0;
+  MARBLE = 1;
+  WOODEN = 2;
+  GRANITE = 3;
+  MOSAIC = 4;
+  CEMENT = 5;
+}
+
+enum CityTier {
+  TIER_1 = 0;
+  TIER_2 = 1;
+  TIER_3 = 2;
+}

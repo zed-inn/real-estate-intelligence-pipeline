@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package real_estate;
+
+import "google/protobuf/descriptor.proto";
+
+/* Metadata for the property attribute fields */
+
+enum FieldSection {
+  SECTION_SKIP = 0;
+  SECTION_LOCATION = 1;
+  SECTION_PRICING = 2;
+  SECTION_INDIVIDUAL_CONFIG = 3;
+  SECTION_SPEC = 4;
+  SECTION_SPEC_FLOOR = 5;
+  SECTION_AMENITY = 6;
+  SECTION_SECURITY = 7;
+  SECTION_PROXIMITY = 8;
+  SECTION_SCORE = 9;
+  SECTION_INFRASTRUCTURE = 10;
+}
+
+message PropertyFieldMetadata {
+  string label = 1;
+  optional string template = 2;
+  optional bool searchable = 3;
+  optional FieldSection section = 4;
+}
+
+message PropertyFieldValidation {
+  optional int32 min = 1;
+  optional int32 max = 2;
+}
+
+extend google.protobuf.FieldOptions {
+  optional PropertyFieldMetadata info = 50000;
+  optional PropertyFieldValidation validation = 50001;
+}

@@ -11,7 +11,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   
   KAFKA_BROKER: z.string().min(1).default("localhost:9092"),
-  KAFKA_CLIENT_ID: z.string().min(1).default("gateway-producer"),
+  KAFKA_CLIENT_ID: z.string().min(1).default("real-estate-gateway-client"),
   
   PYTHON_ENGINE_GRPC_URL: z.string().url().default("http://localhost:50051"),
 });

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package real_estate;
+
+import "real-estate/real-estate-listing.proto";
+
+message ListingIngestedEvent {
+  string listing_id = 1;
+  RealEstateListing listing = 2;
+}
+
+message ListingEmbeddedEvent {
+  string listing_id = 1;
+  string intelligence_context = 2;
+  repeated float embedding = 3;
+}

@@ -4,11 +4,12 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { env } from "@/config/env.js";
-import { propertyRoutes } from "@/api/routes";
-import { connectKafka } from "@/kafka/producer";
-import { startConsumer } from "@/kafka/consumer";
-import { startOutboxPoller } from "@/outbox/poller";
+import { env } from "@/config/env";
+import { ingestRoute } from "@/api/ingest/ingest.route";
+import { searchRoute } from "@/api/search/search.route";
+import { connectKafka } from "@/messaging/kafka.client";
+import { startEmbeddingSyncConsumer } from "@/messaging/consumers/embedding-sync.consumer";
+import { startEventRelayPoller } from "@/messaging/workers/event-relay.worker";
 
 const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
@@ -19,15 +20,16 @@ async function start() {
   try {
     await connectKafka();
 
-    fastify.register(propertyRoutes, { prefix: "/api" });
+    fastify.register(ingestRoute, { prefix: "/api" });
+    fastify.register(searchRoute, { prefix: "/api" });
 
     await fastify.listen({ port: env.PORT, host: env.HOST });
 
-    startConsumer().catch((err) => {
+    startEmbeddingSyncConsumer().catch((err) => {
       fastify.log.error("consumer crashed:", err);
     });
 
-    startOutboxPoller();
+    startEventRelayPoller();
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package semantic_search;
+
+service SemanticSearchEngineService {
+  rpc ExecuteSemanticSearchQuery (SemanticQueryRequest) returns (SemanticQueryResponse) {}
+}
+
+message SemanticQueryRequest { 
+  string search_query_text = 1; 
+}
+
+message SemanticQueryResponse { 
+  repeated float embedding = 1; 
+}

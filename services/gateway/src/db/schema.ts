@@ -26,6 +26,12 @@ export const DbPropertyInsertSchema = DbPropertySchema.omit({
   intelligenceContext: true,
 });
 
+export const DbPropertyUpdateEmbeddingSchema = DbPropertySchema.pick({
+  id: true,
+  embedding: true,
+  intelligenceContext: true,
+});
+
 export const DbOutboxSchema = createSelectSchema(outbox, {
   createdAt: z.coerce.date(),
 });

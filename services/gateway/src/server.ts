@@ -7,6 +7,7 @@ import {
 import { env } from "@/config/env.js";
 import { propertyRoutes } from "@/api/routes";
 import { connectKafka } from "@/kafka/producer";
+import { startConsumer } from "@/kafka/consumer";
 import { startOutboxPoller } from "@/outbox/poller";
 
 const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
@@ -21,6 +22,10 @@ async function start() {
     fastify.register(propertyRoutes, { prefix: "/api" });
 
     await fastify.listen({ port: env.PORT, host: env.HOST });
+
+    startConsumer().catch((err) => {
+      fastify.log.error("consumer crashed:", err);
+    });
 
     startOutboxPoller();
   } catch (err) {

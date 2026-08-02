@@ -1,12 +1,4 @@
-import { KafkaJS } from "@confluentinc/kafka-javascript";
-import { env } from "@/config/env.js";
-
-const { Kafka } = KafkaJS;
-
-const kafka = new Kafka({
-  "bootstrap.servers": env.KAFKA_BROKER,
-  "client.id": env.KAFKA_CLIENT_ID,
-});
+import { kafka } from "@/kafka/connection";
 
 export const producer = kafka.producer({
   "enable.idempotence": true,

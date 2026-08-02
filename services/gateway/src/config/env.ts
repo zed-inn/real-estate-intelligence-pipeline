@@ -12,6 +12,8 @@ const envSchema = z.object({
   
   KAFKA_BROKER: z.string().min(1).default("localhost:9092"),
   KAFKA_CLIENT_ID: z.string().min(1).default("gateway-producer"),
+  
+  PYTHON_ENGINE_GRPC_URL: z.string().url().default("http://localhost:50051"),
 });
 
 const _env = envSchema.safeParse(process.env);

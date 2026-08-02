@@ -161,10 +161,6 @@ message Property {
   optional uint32 bhk = 22 [(info) = { template: "This is a ## bhk property.", label: "BHK", section: SECTION_INDIVIDUAL_CONFIG, searchable: true }, (validation) = {min: 1, max: 10}];
   optional PropertyType property_type = 23 [(info) = { template: "It's a ##.", label: "Property Type", section: SECTION_INDIVIDUAL_CONFIG, searchable: true }];
 
-  // Floor details
-  optional uint32 floor_number = 31 [(info) = { template: "It's on floor ##", label: "Floor", section: SECTION_SPEC_FLOOR }, (validation) = {min: 1}];
-  optional uint32 total_floors = 32 [(info) = { template: "of ## total floors", label: "Total Floors", section: SECTION_SPEC_FLOOR }, (validation) = {min: 1}];
-
   // Specification
   optional uint32 carpet_area_sqft = 24 [(info) = { template: "a carpet area of ## sqft", label: "Carpet Area in Sqft", section: SECTION_SPEC }, (validation) = {min: 0}];
   optional uint32 bathrooms = 25 [(info) = { template: "## bathrooms", label: "Number of Bathrooms", section: SECTION_SPEC }, (validation) = {min: 0}];

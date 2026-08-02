@@ -5,6 +5,9 @@ from src.ml.embedder import generate_embedding
 from src.gen.vector_grpc import VectorEngineBase
 from src.gen.vector_pb import SearchQueryEncodeRequest, EncodeResponse
 
+SearchQueryEncodeRequest.FromString = classmethod(lambda cls, s: cls.from_binary(s))
+EncodeResponse.SerializeToString = lambda self: self.to_binary()
+
 logger = logging.getLogger(__name__)
 
 from grpclib.server import Stream
@@ -16,7 +19,9 @@ class VectorEngineService(VectorEngineBase):
         request = await stream.recv_message()
         text = request.search_query_text
         
-        vector_data = await asyncio.to_thread(generate_embedding, text)
+        query = f"Represent this sentence for searching relevant passages: {text}"
+        
+        vector_data = await asyncio.to_thread(generate_embedding, query)
         
         await stream.send_message(EncodeResponse(embedding=vector_data))
 

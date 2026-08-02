@@ -15,7 +15,7 @@ export function startOutboxPoller() {
     try {
       await db.transaction(async (tx) => {
         const result = await tx.execute(sql`
-          SELECT id, topic, payload, created_at FROM outbox
+          SELECT id, topic, payload, created_at AS "createdAt" FROM outbox
           ORDER BY created_at ASC
           FOR UPDATE SKIP LOCKED
           LIMIT ${OUTBOX_BATCH_SIZE}

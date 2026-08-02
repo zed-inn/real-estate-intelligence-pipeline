@@ -6,7 +6,10 @@ import { fromBinary } from "@bufbuild/protobuf";
 import { EmbeddedPropertyEventSchema } from "@/gen/events_pb.js";
 
 export const consumer = kafka.consumer({
-  "group.id": "gateway-embedding-updater",
+  kafkaJS: {
+    groupId: "gateway-embedding-updater-v2",
+    fromBeginning: true,
+  }
 });
 
 export async function startConsumer() {

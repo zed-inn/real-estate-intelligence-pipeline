@@ -82,10 +82,12 @@ export const propertyRoutes: FastifyPluginAsyncZod = async (fastify) => {
             bhk: properties.bhk,
             propertyType: properties.propertyType,
             intelligenceContext: properties.intelligenceContext,
-            similarityScore: sql<number>`1 - ${distance}`.as("similarityScore"),
+            similarityScore: sql<number>`1 - (${distance})`.as("similarityScore"),
           })
           .from(properties)
-          .where(isNotNull(properties.embedding))
+          .where(
+            sql`${properties.embedding} IS NOT NULL AND ${distance} < 0.5`
+          )
           .orderBy(distance)
           .limit(limit)
           .offset(offset);

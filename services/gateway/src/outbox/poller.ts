@@ -4,10 +4,7 @@ import { sql, inArray } from "drizzle-orm";
 import { producer } from "@/kafka/producer.js";
 import { PropertyIngestedEventSchema } from "@/gen/events_pb.js";
 import { fromJson, toBinary } from "@bufbuild/protobuf";
-import { createValidator } from "@bufbuild/protovalidate";
 import { OUTBOX_BATCH_SIZE } from "@/config/constants.js";
-
-const validator = createValidator();
 
 export function startOutboxPoller() {
   console.log(

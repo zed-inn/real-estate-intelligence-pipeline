@@ -146,7 +146,7 @@ message Property {
   optional double longitude_degrees = 11 [(info) = { section: SECTION_SKIP }, (validation) = { min: -180, max: 180 }];
 
   // Pricing
-  double price_crore = 12 [(info) = { template: "priced at ## crores", label: "Price in Crores", section: SECTION_PRICING, searchable: true }, (validation) = {min: 0}];
+  double price_crore = 12 [(info) = { template: "Priced at ## crores", label: "Price in Crores", section: SECTION_PRICING, searchable: true }, (validation) = {min: 0}];
   optional bool is_negotiable = 13 [(info) = { template: "where price is negotiable", label: "Negotiable", section: SECTION_PRICING }];
   optional double price_rs_per_sqft = 14 [(info) = { template: "at rs. ## per sqft", label: "Price/sqft in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
   optional double maintenance_monthly_rs = 15 [(info) = { template: "with rs. ## monthly maintenance", label: "Maintenance in Rupees", section: SECTION_PRICING }, (validation) = {min: 0}];
@@ -158,7 +158,7 @@ message Property {
   optional double expected_rental_yield_percent = 21 [(info) = { template: "expected rental yield of ##%", label: "Rental Yield in Percent", section: SECTION_PRICING }, (validation) = {min: 0, max: 100}];
 
   // Bhk and Property type
-  optional uint32 bhk = 22 [(info) = { template: "This is a ## bhk property.", label: "BHK", section: SECTION_INDIVIDUAL_CONFIG, searchable: true }, (validation) = {min: 1, max: 10}];
+  optional uint32 bhk = 22 [(info) = { template: "This is a ## BHK Property.", label: "BHK", section: SECTION_INDIVIDUAL_CONFIG, searchable: true }, (validation) = {min: 1, max: 10}];
   optional PropertyType property_type = 23 [(info) = { template: "It's a ##.", label: "Property Type", section: SECTION_INDIVIDUAL_CONFIG, searchable: true }];
 
   // Specification
@@ -176,8 +176,8 @@ message Property {
   optional string khata_type = 38 [(info) = { template: "## khata", label: "Khata Type", section: SECTION_SPEC }];
 
   // Duplex and Corner plot
-  optional bool is_duplex = 40 [(info) = { template: "This is a duplex property.", label: "Duplex", section: SECTION_INDIVIDUAL_CONFIG }];
-  optional bool is_corner_plot = 41 [(info) = { template: "The property sits on a corner plot.", label: "Corner Plot", section: SECTION_INDIVIDUAL_CONFIG }];
+  optional bool is_duplex = 40 [(info) = { template: "This is a Duplex Property.", label: "Duplex", section: SECTION_INDIVIDUAL_CONFIG }];
+  optional bool is_corner_plot = 41 [(info) = { template: "The property sits on a Corner Plot.", label: "Corner Plot", section: SECTION_INDIVIDUAL_CONFIG }];
   
   // Infrastructure
   optional WaterSupply water_supply = 42 [(info) = { template: "## water supply", label: "Water Supply", section: SECTION_INFRASTRUCTURE }];

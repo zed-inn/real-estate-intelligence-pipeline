@@ -30,7 +30,7 @@ function createPropertyDatabaseSchema() {
         case "scalar":
           switch (field.scalar) {
             case ScalarType.STRING:
-              schema += `varchar('${field.name}'${rules?.max ? `, { length: ${rules.max} }` : ""})`;
+              schema += `text('${field.name}')`;
               break;
 
             case ScalarType.DOUBLE:

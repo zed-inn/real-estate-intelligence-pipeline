@@ -6,8 +6,8 @@ import { sql } from 'drizzle-orm';
 
 export const properties = pgTable('properties', {
 id: uuid('id').default(sql`uuidv7()`).primaryKey(),
-city: varchar('city').notNull(),
-state: varchar('state').notNull(),
+city: text('city').notNull(),
+state: text('state').notNull(),
 pinCode: integer('pin_code').notNull(),
 priceCrore: numeric('price_crore', {mode: "number"}).notNull(),
 bhk: integer('bhk'),

@@ -3,7 +3,7 @@ from src.config import settings
 from src.kafka.client import get_kafka_consumer, get_kafka_producer
 from src.ml.embedder import generate_embedding
 from src.ml.context_builder import build_intelligence_context
-from gen.events_pb import PropertyIngestedEvent, EmbeddedPropertyEvent
+from src.gen.events_pb import PropertyIngestedEvent, EmbeddedPropertyEvent
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

@@ -1,21 +1,22 @@
-from gen.events_pb import PropertyIngestedEvent, ext_info, FieldCategory
+import json
+import os
+import re
+from src.gen.events_pb import PropertyIngestedEvent
+from src.gen.property.property_pb import Property, ext_info, FieldSection
 
-CATEGORY_ORDER = [
-    FieldCategory.CATEGORY_LOCATION,
-    FieldCategory.CATEGORY_PRICING,
-    FieldCategory.CATEGORY_SPEC,
-    FieldCategory.CATEGORY_INFRASTRUCTURE,
-    FieldCategory.CATEGORY_PROXIMITY,
-    FieldCategory.CATEGORY_SCORE
-]
+json_path = os.path.join(
+    os.path.dirname(__file__), 
+    "..", "gen", "property", "property_section_startings.json"
+)
+
+with open(json_path, "r") as f:
+    SECTION_STARTINGS = json.load(f)
 
 def build_intelligence_context(payload: PropertyIngestedEvent) -> str:
-    categorized: dict[FieldCategory, list[str]] = {cat: [] for cat in CATEGORY_ORDER}
-    amenities: list[str] = []
-    security: list[str] = []
+    categorized = {section: [] for section in FieldSection}
     
-    for field in PropertyIngestedEvent.desc().fields:
-        value = getattr(payload, field.name, None)
+    for field in Property.desc().fields:
+        value = getattr(payload.property, field.name, None)
         
         if value is None or value == "" or value == 0 or value is False:
             continue
@@ -24,38 +25,46 @@ def build_intelligence_context(payload: PropertyIngestedEvent) -> str:
             continue
         
         metadata = field.proto.options[ext_info]
-        if not metadata or not metadata.natural_tone:
+        if not metadata or not metadata.template:
             continue
         
-        category = metadata.category
-        tone = metadata.natural_tone
+        section = metadata.section
+        template = metadata.template
         
-        if category == FieldCategory.CATEGORY_SKIP:
+        if section == FieldSection.SECTION_SKIP:
             continue
-        
-        if category == FieldCategory.CATEGORY_AMENITY:
-            if value is True:
-                amenities.append(tone)
+            
+            
+        categorized[section].append(template.replace("##", str(value).title()))
+    
+    parts = []
+    
+    for section in sorted(FieldSection, key=lambda s: s.value):
+        if section == FieldSection.SECTION_SKIP:
             continue
-        
-        if category == FieldCategory.CATEGORY_SECURITY:
-            if value is True:
-                security.append(tone)
+            
+        items = categorized[section]
+        if not items:
             continue
+            
+        start_str = SECTION_STARTINGS.get(section.name, "")
         
-        if category in categorized:
-            categorized[category].append(tone.replace("##", str(value)))
+        if section.name == "SECTION_INDIVIDUAL_CONFIG":
+            section_text = " ".join(items)
+        else:
+            section_text = ", ".join(items)
+            
+        if start_str:
+            part = f"{start_str} {section_text}"
+        else:
+            part = section_text
+            
+        # Capitalize only the first letter of the whole part
+        if part:
+            parts.append(part[0].upper() + part[1:])
+            
+    paragraph = ". ".join(p.rstrip('.') for p in parts)
     
-    parts: list[str] = []
-    for cat in CATEGORY_ORDER:
-        parts.extend(categorized[cat])
-    
-    paragraph = ", ".join(parts)
-    
-    if amenities:
-        paragraph += ". Amenities include " + ", ".join(amenities)
-    
-    if security:
-        paragraph += ". Security features include " + ", ".join(security)
+    paragraph = re.sub(r'\s+', ' ', paragraph).strip()
     
     return paragraph[0].upper() + paragraph[1:] + "." if paragraph else "."

@@ -3,4 +3,4 @@ inputs:
   - directory: ../../shared/proto
 plugins:
   - local: protoc-gen-py
-    out: gen
+    out: src/gen

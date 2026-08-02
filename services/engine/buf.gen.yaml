@@ -4,3 +4,5 @@ inputs:
 plugins:
   - local: protoc-gen-py
     out: src/gen
+  - local: protoc-gen-grpclib_python
+    out: src/gen

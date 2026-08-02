@@ -12,6 +12,7 @@ generate_protos_python:
 	@echo "Generating Python protos..."
 	@cd ${MAKEFILE_DIR}services/engine && uv run buf generate
 	@cp ${MAKEFILE_DIR}shared/proto/property/property_section_startings.json ${MAKEFILE_DIR}services/engine/src/gen/property/property_section_startings.json
+	@sed -i 's/import vector_pb2/from . import vector_pb as vector_pb2/g' ${MAKEFILE_DIR}services/engine/src/gen/vector_grpc.py
 	@echo "Python protos generated successfully!"
 
 

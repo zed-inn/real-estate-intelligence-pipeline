@@ -1,17 +1,26 @@
 import { db } from "@/db/index";
-import { eventRelayQueue, DbEventRelayQueueSchema, DbRealEstateListingSchema } from "@/db/schema";
+import {
+  eventRelayQueue,
+  DbEventRelayQueueSchema,
+  DbRealEstateListingSchema,
+} from "@/db/schema";
 import { sql, inArray } from "drizzle-orm";
 import { producer } from "@/messaging/kafka.client";
 import { ListingIngestedEventSchema } from "@/gen/real-estate/listing-events_pb";
 import { fromJson, toBinary } from "@bufbuild/protobuf";
 import { EVENT_RELAY_BATCH_SIZE } from "@/config/constants";
 
-export function startEventRelayPoller() {
+export function startEventRelayPoller(signal: AbortSignal) {
   console.log(
     "starting event relay poller with zod row validation and protobuf serialization...",
   );
 
   async function poll() {
+    if (signal.aborted) {
+      console.log("abort signal received, stopping event relay poller.");
+      return;
+    }
+
     try {
       await db.transaction(async (tx: any) => {
         const result = await tx.execute(sql`
@@ -72,13 +81,17 @@ export function startEventRelayPoller() {
             await producer.send({ topic, messages });
           }
 
-          await tx.delete(eventRelayQueue).where(inArray(eventRelayQueue.id, idsToDelete));
+          await tx
+            .delete(eventRelayQueue)
+            .where(inArray(eventRelayQueue.id, idsToDelete));
         }
       });
     } catch (error) {
       console.error("event relay poller error:", error);
     } finally {
-      setTimeout(poll, 2000);
+      if (!signal.aborted) {
+        setTimeout(poll, 2000);
+      }
     }
   }
   poll();

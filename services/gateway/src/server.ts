@@ -42,7 +42,18 @@ async function start() {
       fastify.log.error("consumer crashed:", err);
     });
 
-    startEventRelayPoller();
+    const abortController = new AbortController();
+    startEventRelayPoller(abortController.signal);
+
+    const shutdown = async () => {
+      fastify.log.info("shutting down gracefully...");
+      abortController.abort();
+      await fastify.close();
+      process.exit(0);
+    };
+
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

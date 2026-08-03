@@ -3,11 +3,11 @@ import { db } from "@/db/index";
 import { realEstateListings, DbRealEstateListingUpdateEmbeddingSchema } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { fromBinary } from "@bufbuild/protobuf";
-import { env } from "@/config/env";
 import { ListingEmbeddedEventSchema } from "@/gen/real-estate/listing-events_pb";
 import { KAFKA_TOPICS } from "@/config/constants";
 
 export const consumer = kafka.consumer({
+  "allow.auto.create.topics": true,
   kafkaJS: {
     groupId: "real-estate-embedding-sync-group",
     fromBeginning: true,

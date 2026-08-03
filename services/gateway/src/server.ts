@@ -20,6 +20,10 @@ async function start() {
   try {
     await connectKafka();
 
+    fastify.get("/health", async (request, reply) => {
+      return { status: "ok" };
+    });
+
     fastify.register(ingestRoute, { prefix: "/api" });
     fastify.register(searchRoute, { prefix: "/api" });
 

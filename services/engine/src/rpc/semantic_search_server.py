@@ -10,6 +10,8 @@ SemanticQueryResponse.SerializeToString = lambda self: self.to_binary()
 
 logger = logging.getLogger(__name__)
 
+import os
+import time
 from grpclib.server import Stream
 
 class SemanticSearchEngineService(SemanticSearchEngineServiceBase):
@@ -25,8 +27,25 @@ class SemanticSearchEngineService(SemanticSearchEngineServiceBase):
         
         await stream.send_message(SemanticQueryResponse(embedding=vector_data))
 
+async def heartbeat_writer():
+    while True:
+        try:
+            with open("/tmp/engine_healthy", "w") as f:
+                f.write(str(int(time.time()) + 40))
+        except Exception as e:
+            logger.error(f"failed to write heartbeat: {e}")
+        await asyncio.sleep(10)
+
 async def serve_grpc():
     server = Server([SemanticSearchEngineService()])
     await server.start("0.0.0.0", 50051)
     logger.info("python grpc semantic search engine listening on 0.0.0.0:50051")
-    await server.wait_closed()
+    
+    heartbeat_task = asyncio.create_task(heartbeat_writer())
+    
+    try:
+        await server.wait_closed()
+    finally:
+        heartbeat_task.cancel()
+        if os.path.exists("/tmp/engine_healthy"):
+            os.remove("/tmp/engine_healthy")

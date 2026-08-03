@@ -36,6 +36,13 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redpanda-console:
     image: docker.redpanda.com/redpandadata/console:latest
@@ -45,7 +52,7 @@ services:
       KAFKA_BROKERS: kafka:29092
     depends_on:
       kafka:
-        condition: service_started
+        condition: service_healthy
 
   engine:
     build:
@@ -54,7 +61,13 @@ services:
       - KAFKA_BROKER=kafka:29092
     depends_on:
       kafka:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", 'EXP=$$(cat /tmp/engine_healthy); NOW=$$(date +%s); test $$EXP -gt $$NOW && test $$(expr $$EXP - $$NOW) -le 40']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   gateway:
     build:
@@ -71,9 +84,15 @@ services:
       db:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
       engine:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   pgdata:

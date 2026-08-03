@@ -2,7 +2,8 @@ import json
 import os
 import re
 from src.gen.real_estate.listing_events_pb import ListingIngestedEvent
-from src.gen.real_estate.real_estate_listing_pb import RealEstateListing, ext_info, FieldSection
+from src.gen.real_estate.real_estate_listing_pb import RealEstateListing
+from src.gen.real_estate.metadata_pb import ext_info, FieldSection
 
 json_path = os.path.join(
     os.path.dirname(__file__), 

@@ -10,8 +10,12 @@ import { searchRoute } from "@/api/search/search.route";
 import { connectKafka } from "@/messaging/kafka.client";
 import { startEmbeddingSyncConsumer } from "@/messaging/consumers/embedding-sync.consumer";
 import { startEventRelayPoller } from "@/messaging/workers/event-relay.worker";
+import fastifyRateLimit from "@fastify/rate-limit";
 
-const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+const fastify = Fastify({
+  logger: true,
+  bodyLimit: 1048576,
+}).withTypeProvider<ZodTypeProvider>();
 
 fastify.setValidatorCompiler(validatorCompiler);
 fastify.setSerializerCompiler(serializerCompiler);
@@ -19,6 +23,11 @@ fastify.setSerializerCompiler(serializerCompiler);
 async function start() {
   try {
     await connectKafka();
+
+    await fastify.register(fastifyRateLimit, {
+      max: 100,
+      timeWindow: "1 minute",
+    });
 
     fastify.get("/health", async (request, reply) => {
       return { status: "ok" };

@@ -17,6 +17,7 @@
     "@confluentinc/kafka-javascript": "^1.10.0",
     "@connectrpc/connect": "^2.1.2",
     "@connectrpc/connect-node": "^2.1.2",
+    "@fastify/rate-limit": "^11.2.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",

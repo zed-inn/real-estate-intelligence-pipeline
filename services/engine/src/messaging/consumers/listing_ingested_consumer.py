@@ -6,9 +6,14 @@ from src.messaging.kafka_client import get_kafka_consumer, get_kafka_producer
 from src.ml.semantic_vectorizer import generate_embedding
 from src.ml.intelligence_context_generator import build_intelligence_context
 from src.gen.real_estate.listing_events_pb import ListingIngestedEvent, ListingEmbeddedEvent
+from prometheus_client import Summary, Counter
 
 logger = logging.getLogger(__name__)
 
+EMBEDDING_TIME = Summary('engine_embedding_processing_seconds', 'Time spent generating embeddings')
+EMBEDDING_COUNT = Counter('engine_embeddings_total', 'Total number of embeddings generated')
+
+@EMBEDDING_TIME.time()
 def process_ingested_message(msg_value: bytes, producer) -> str:
     payload = ListingIngestedEvent.from_binary(msg_value)
     context = build_intelligence_context(payload)
@@ -20,6 +25,8 @@ def process_ingested_message(msg_value: bytes, producer) -> str:
             intelligence_context=context,
             embedding=embedding
     )
+    
+    EMBEDDING_COUNT.inc()
     
     producer.produce(
         topic=KafkaTopics.REAL_ESTATE_LISTING_EMBEDDED,

@@ -11,10 +11,12 @@ import { connectKafka } from "@/messaging/kafka.client";
 import { startEmbeddingSyncConsumer } from "@/messaging/consumers/embedding-sync.consumer";
 import { startEventRelayPoller } from "@/messaging/workers/event-relay.worker";
 import fastifyRateLimit from "@fastify/rate-limit";
+import fastifyMetrics from "fastify-metrics";
 
 const fastify = Fastify({
   logger: true,
   bodyLimit: 1048576,
+  trustProxy: env.NODE_ENV === "development" || env.NODE_ENV === "test",
 }).withTypeProvider<ZodTypeProvider>();
 
 fastify.setValidatorCompiler(validatorCompiler);
@@ -27,6 +29,10 @@ async function start() {
     await fastify.register(fastifyRateLimit, {
       max: 100,
       timeWindow: "1 minute",
+    });
+
+    await fastify.register(fastifyMetrics, {
+      endpoint: '/metrics'
     });
 
     fastify.get("/health", async (request, reply) => {

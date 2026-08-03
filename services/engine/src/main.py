@@ -3,6 +3,7 @@ import asyncio
 import threading
 from src.messaging.consumers.listing_ingested_consumer import run_listing_event_consumer_sync
 from src.rpc.semantic_search_server import serve_grpc
+from prometheus_client import start_http_server
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -11,6 +12,8 @@ shutdown_event = threading.Event()
 
 async def main():
     logger.info("starting python intelligence engine...")
+    start_http_server(8000)
+    logger.info("Prometheus metrics server started on port 8000")
     
     try:
         await asyncio.gather(

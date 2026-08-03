@@ -88,7 +88,7 @@ function writeToFile(schema: Record<string, {type: string, definition: string, i
   writeFileSync(absFilename, "");
   appendFileSync(
     absFilename,
-    `import { pgTable, pgEnum, uuid, varchar, timestamp, jsonb, boolean, integer, numeric, text } from "drizzle-orm/pg-core";\nimport { vector } from 'drizzle-orm/pg-core';\nimport { sql } from 'drizzle-orm';\n\n`,
+    `import { pgTable, pgEnum, uuid, varchar, timestamp, jsonb, boolean, integer, numeric, text, index } from "drizzle-orm/pg-core";\nimport { vector } from 'drizzle-orm/pg-core';\nimport { sql } from 'drizzle-orm';\n\n`,
   );
 
   for (const [fieldName, fieldObj] of Object.entries(schema)) {
@@ -110,7 +110,7 @@ function writeToFile(schema: Record<string, {type: string, definition: string, i
     }
   }
 
-  appendFileSync(absFilename, `})\n\n`);
+  appendFileSync(absFilename, `}, (table) => [\n  index('embedding_index').using('hnsw', table.embedding.op('vector_cosine_ops')),\n])\n\n`);
 }
 
 const FILENAME = "real-estate-drizzle-schema.ts";

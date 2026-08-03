@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, uuid, varchar, timestamp, jsonb, boolean, integer, numeric, text } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, uuid, varchar, timestamp, jsonb, boolean, integer, numeric, text, index } from "drizzle-orm/pg-core";
 import { vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -17,5 +17,7 @@ rawFeatures: jsonb('raw_features').notNull(),
 intelligenceContext: text('intelligence_context'),
 embedding: vector('embedding', { dimensions: 384 }),
 createdAt: timestamp('created_at').defaultNow().notNull(),
-})
+}, (table) => [
+  index('embedding_index').using('hnsw', table.embedding.op('vector_cosine_ops')),
+])
 

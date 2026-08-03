@@ -9,13 +9,13 @@ import grpclib.client
 if typing.TYPE_CHECKING:
     import grpclib.server
 
-import semantic_search.semantic_search_pb2
+from . import semantic_search_pb as semantic_search_pb2
 
 
 class SemanticSearchEngineServiceBase(abc.ABC):
 
     @abc.abstractmethod
-    async def ExecuteSemanticSearchQuery(self, stream: 'grpclib.server.Stream[semantic_search.semantic_search_pb2.SemanticQueryRequest, semantic_search.semantic_search_pb2.SemanticQueryResponse]') -> None:
+    async def ExecuteSemanticSearchQuery(self, stream: 'grpclib.server.Stream[semantic_search_pb2.SemanticQueryRequest, semantic_search_pb2.SemanticQueryResponse]') -> None:
         pass
 
     def __mapping__(self) -> typing.Dict[str, grpclib.const.Handler]:
@@ -23,8 +23,8 @@ class SemanticSearchEngineServiceBase(abc.ABC):
             '/semantic_search.SemanticSearchEngineService/ExecuteSemanticSearchQuery': grpclib.const.Handler(
                 self.ExecuteSemanticSearchQuery,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                semantic_search.semantic_search_pb2.SemanticQueryRequest,
-                semantic_search.semantic_search_pb2.SemanticQueryResponse,
+                semantic_search_pb2.SemanticQueryRequest,
+                semantic_search_pb2.SemanticQueryResponse,
             ),
         }
 
@@ -35,6 +35,6 @@ class SemanticSearchEngineServiceStub:
         self.ExecuteSemanticSearchQuery = grpclib.client.UnaryUnaryMethod(
             channel,
             '/semantic_search.SemanticSearchEngineService/ExecuteSemanticSearchQuery',
-            semantic_search.semantic_search_pb2.SemanticQueryRequest,
-            semantic_search.semantic_search_pb2.SemanticQueryResponse,
+            semantic_search_pb2.SemanticQueryRequest,
+            semantic_search_pb2.SemanticQueryResponse,
         )

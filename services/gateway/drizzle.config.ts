@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
@@ -5,6 +6,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: 'postgres://db_admin:db_secret_password@localhost:5432/intelligence_db',
+    url: process.env.DATABASE_URL || 'postgres://db_admin:db_secret_password@localhost:5433/intelligence_db',
   },
 });

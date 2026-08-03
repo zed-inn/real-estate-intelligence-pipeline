@@ -13,6 +13,17 @@ export const producer = kafka.producer({
 });
 
 export async function connectKafka() {
-  await producer.connect();
-  console.log("connected to kafka broker");
+  let retries = 10;
+  while (retries > 0) {
+    try {
+      await producer.connect();
+      console.log("connected to kafka broker");
+      return;
+    } catch (err) {
+      console.error(`Kafka connection failed, retrying... (${retries} attempts left)`);
+      retries--;
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+  }
+  throw new Error("Failed to connect to Kafka after multiple retries.");
 }

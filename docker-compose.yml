@@ -1,15 +1,14 @@
-name: intelligence-pipeline
+name: real-estate-pipeline
 
 services:
   db:
     image: pgvector/pgvector:pg18
-    container_name: intelligence_db
     environment:
       POSTGRES_USER: db_admin
       POSTGRES_PASSWORD: db_secret_password
       POSTGRES_DB: intelligence_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql
       - ./db/init:/docker-entrypoint-initdb.d:ro
@@ -21,7 +20,6 @@ services:
 
   kafka:
     image: apache/kafka:latest
-    container_name: kafka
     ports:
       - "9092:9092"
     environment:
@@ -29,7 +27,7 @@ services:
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      # dual listeners; one for redpanda, and other for services
+      # PLAINTEXT is internal, PLAINTEXT_HOST is mapped for host access
       KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
@@ -41,14 +39,41 @@ services:
 
   redpanda-console:
     image: docker.redpanda.com/redpandadata/console:latest
-    container_name: redpanda-console
     ports:
       - "8080:8080"
     environment:
       KAFKA_BROKERS: kafka:29092
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
 
+  engine:
+    build:
+      context: ./services/engine
+    environment:
+      - KAFKA_BROKER=kafka:29092
+    depends_on:
+      kafka:
+        condition: service_started
+
+  gateway:
+    build:
+      context: ./services/gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgres://db_admin:db_secret_password@db:5432/intelligence_db
+      - KAFKA_BROKER=kafka:29092
+      - PYTHON_ENGINE_GRPC_URL=http://engine:50051
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      engine:
+        condition: service_started
 
 volumes:
   pgdata:

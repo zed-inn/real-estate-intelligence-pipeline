@@ -14,7 +14,8 @@ generate_protos_python:
 	@cd ${MAKEFILE_DIR}services/engine && uv run buf generate
 	@mkdir -p ${MAKEFILE_DIR}services/engine/src/gen/real_estate
 	@cp ${MAKEFILE_DIR}shared/proto/real-estate/real-estate-listing-section-startings.json ${MAKEFILE_DIR}services/engine/src/gen/real_estate/real_estate_listing_section_startings.json
-	@sed -i 's/import semantic_search_pb2/from . import semantic_search_pb as semantic_search_pb2/g' ${MAKEFILE_DIR}services/engine/src/gen/semantic_search/semantic_search_grpc.py
+	@sed -i 's/import semantic_search\.semantic_search_pb2/from . import semantic_search_pb as semantic_search_pb2/g' ${MAKEFILE_DIR}services/engine/src/gen/semantic_search/semantic_search_grpc.py
+	@sed -i 's/semantic_search\.semantic_search_pb2/semantic_search_pb2/g' ${MAKEFILE_DIR}services/engine/src/gen/semantic_search/semantic_search_grpc.py
 	@echo "Python protos generated successfully!"
 
 
@@ -22,6 +23,7 @@ generate_zod_schema_real_estate:
 	@echo "Generating Zod Schema from Real Estate Schema..."
 	@cd ${MAKEFILE_DIR}services/gateway && npx tsx src/scripts/build-zod-schema.ts
 	@echo "Zod Schema generated successfully!"
+
 
 generate_drizzle_schema_real_estate:
 	@echo "Generating Drizzle Schema from Real Estate Schema..."
@@ -43,3 +45,23 @@ clean:
 	rm -rf ${MAKEFILE_DIR}services/gateway/src/gen
 	rm -rf ${MAKEFILE_DIR}services/engine/src/gen
 	@echo "All protos cleaned successfully!"
+
+
+docker-up:
+	@echo "Orchestrating full pipeline build..."
+	make clean
+	make all
+	sudo docker compose up --build -d
+	@echo "Pipeline is successfully running!"
+
+
+docker-stop:
+	@echo "Stopping docker (not deleting containers/images/volumes)..."
+	sudo docker compose stop
+	@echo "Pipeline is successfully stopped!"
+
+
+docker-down:
+	@echo "Ending docker (deleting containers)..."
+	sudo docker compose down
+	@echo "Pipeline is successfully down!"

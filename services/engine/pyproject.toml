@@ -3,7 +3,7 @@ name = "engine"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "confluent-kafka>=2.15.0",
     "grpclib>=0.4.9",
@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.2",
     "sentence-transformers>=5.6.1",
+    "torch>=2.13.0",
 ]
 
 [dependency-groups]
@@ -18,3 +19,11 @@ dev = [
     "protoc-gen-py",
     "buf-bin",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }

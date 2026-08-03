@@ -131,3 +131,6 @@ $DC exec -T db psql -U db_admin -d intelligence_db -c "SELECT COUNT(*) as embedd
 $DC exec -T db psql -U db_admin -d intelligence_db -c "SELECT property_type, COUNT(*) FROM real_estate_listings GROUP BY property_type;" | tee -a "$RESULTS_DIR/db_integrity.txt"
 
 echo "Load Test Complete. Results in $RESULTS_DIR."
+
+# Auto-generate the comprehensive metrics.md report
+bash "$PROJ_DIR/scripts/generate_metrics_md.sh"

@@ -5,9 +5,9 @@
 ![Redpanda](https://img.shields.io/badge/Redpanda-Kafka_Compatible-FF6600?style=flat-square)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector_HNSW-4169E1?style=flat-square&logo=postgresql)
 
-A production-grade, event-driven semantic search pipeline for real estate. POST a property's structured attributes — BHK, price, amenities, proximity distances, livability scores. The pipeline converts them into a semantic vector. When a user searches _"quiet gated 3BHK near metro with a gym"_, they get back listings ranked by meaning, not keyword overlap.
+A highly concurrent, event-driven semantic search pipeline for real estate inventory. It takes strictly typed property attributes—BHK, price, amenities, proximity scores—and mathematically projects them into a dense vector space. Instead of relying on brittle SQL keyword filters, this pipeline allows users to search for "peaceful top-floor flat near a metro" and receive listings ranked by semantic relevance.
 
-The hard part isn't the search. It's getting 101 typed fields to respond correctly to unstructured natural-language queries, across a polyglot TypeScript/Python boundary, with zero event loss if any service goes down mid-flight.
+The machine learning implementation itself is straightforward; the actual engineering challenge is state logistics. This architecture solves the problem of reliably routing 101+ typed fields across a polyglot TypeScript/Python boundary under heavy load. It prioritizes data integrity, utilizing a PostgreSQL Transactional Outbox and Redpanda (Kafka) to guarantee zero event loss and eventually consistent searchability, even if downstream microservices crash mid-flight.
 
 ---
 

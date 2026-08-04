@@ -444,12 +444,10 @@ curl "http://localhost:3000/search?q=peaceful+gated+3BHK+near+metro+with+gym&lim
 ```
 
 ```bash
-make up           # Build and start all services
-make down         # Stop all services
-make logs         # Tail all container logs
-make proto        # Regenerate all code from .proto files
-make load-test    # Run the full k6 load test (requires k6)
-make dlq-replay   # Replay failed messages from the DLQ
+make docker-up           # Build and start all services
+make docker-down         # Stop all services
+make all                 # Create all protos
+make clean               # Delete all protos generated
 ```
 
 ---

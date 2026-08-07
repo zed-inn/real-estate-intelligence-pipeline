@@ -482,17 +482,14 @@ Health check and Prometheus scrape endpoint (gateway).
 
 ## Roadmap
 
-**Next — React search UI**
+**React search UI**
 A search input and property results grid with similarity scores and the intelligence context visible per result. Makes the semantic ranking self-evident: you can see _why_ a listing ranked where it did — which is the hardest part to explain to a non-technical audience.
 
-**Near-term — Split Python engine into two services**
+**Split Python engine into two services**
 One process handles two workloads with different scaling curves: the Kafka embedding worker (CPU-bound, scales with partition count) and the gRPC query vectorizer (latency-sensitive, scales with search QPS). This is the root cause of the P95 tail. Splitting into `embedding-worker` and `query-vectorizer` takes ~1 day and removes the coupling entirely — 3 partitions → 3 embedding replicas → ~19 vectors/s; query-vectorizer scales independently.
 
-**Near-term — Hybrid search: BM25 + vector (RRF)**
+**Hybrid search: BM25 + vector (RRF)**
 Pure vector search underperforms on queries with specific proper nouns — society names, Metro stations, localities — where keyword matching outperforms dense similarity. Adding PostgreSQL `tsvector`/`tsquery` full-text search and merging ranked lists via Reciprocal Rank Fusion (RRF) handles both query types correctly.
 
-**Later — Re-embedding backfill on schema change**
+**Re-embedding backfill on schema change**
 New proto fields produce correct vectors for new listings but leave existing rows with stale embeddings. A backfill job that re-runs the context builder and re-embeds rows where `intelligence_context` doesn't contain the new field's template string is needed before schema evolution is safe at scale.
-
-**Later — Grafana dashboards**
-Importable JSON for both services: request throughput + P95 latency (gateway), embedding rate + consumer lag over time (engine). Auto-provisioned via Docker Compose volume mount into the Grafana container.

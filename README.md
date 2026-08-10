@@ -299,52 +299,6 @@ The project includes a fully configured Prometheus stack scraping both services 
 
 ---
 
-## Engineering Journey
-
-**Phase 1 — Foundation:** Scaffolded Fastify + Drizzle + Postgres. Targeted PostgreSQL 18 for native `uuidv7()` — PG18's Docker volume layout had changed, mounts failed. Fell back to PG16 + custom SQL function.
-
-**Phase 2 — The Protobuf Battle:** Started with JSON on Kafka. Pivoted to Protobuf for schema enforcement across the TypeScript/Python boundary. `@confluentinc/kafka-javascript` encoded message values differently than the Python consumer expected — hex vs. raw binary. Debugged the buffer mismatch. Wrote the codegen scripts to auto-generate Zod and Drizzle schemas from proto descriptors. Migrated from `betterproto` to `protobuf-py` when extension imports broke after schema refactoring.
-
-**Phase 3 — The LLM Pivot:** Original design: Ollama LLM to generate natural language from property JSON before embedding. ~5,000 ms per listing, hallucinated amenities, non-deterministic. Replaced with the deterministic proto-template context builder. Processing dropped to ~0.5 ms per listing.
-
-**Phase 4 — The Search Pivot:** Original design: synchronous gRPC call to Python engine during ingest. Under load, the ML bottleneck propagated directly to ingest latency. Replaced with async Kafka for the ingest path — Gateway returns `201` immediately. gRPC kept only for the search query vectorization path where synchronous response is unavoidable.
-
-**Phase 5 — Hardening:** Kafka consumer race condition fix. DLQ architecture. HNSW index. Rate limiting. Graceful shutdown with `AbortSignal`. DLQ replay tooling.
-
-**Phase 6 — Observability Chaos:** k6 failed with `429` — engineered the IP-spoofing bypass. k6 then failed with `400` — the script asserted `200 OK` but the API correctly returns `201 Created`. Fixed assertions. PromQL `{job="engine"}` broke in Bash due to double-quote expansion. Built the full `generate_metrics_md.sh` pipeline parsing 40+ JSON payloads into a rendered artifact.
-
-```
-f9e534f  chore: init infra and scaffold project
-6d1559b  chore: integrate local ollama infra for text synthesis
-640a657  chore: upgrade postgresql to v18 for native uuidv7 support
-f904cbf  fix: create extension vector on first run and uuidv7 function name fix
-7154f08  fix: pg18 volume requires new layout, remove volume and restart container
-bd7a66f  feat: implement core gateway and kafka and outbox poller
-758f732  feat: add EmbeddedPropertyEvent schema for ML vector pipeline
-70dba16  feat: scaffold and complete python stateless engine
-3803398  refactor: add natural tone/lang in proto as metadata, change betterproto → protobuf-py
-c4c6fcc  refactor: replace llm context builder with deterministic protobuf metadata
-fbe2d78  refactor: change proto schemas to adapt to events, attributes and rpc calls
-3b2dd63  refactor: introduce makefile and refactor protobuf toolchain
-0a51690  feat: automate zod and drizzle schema generation
-5b381a4  refactor: api handlers and outbox poller with validation end-to-end
-85425ba  fix: change varchar → text in postgres for no max length and no perf loss
-9374945  feat: implement embedding consumer to persist property vector
-b36cdb6  feat: implement async gRPC vector search server
-c347450  feat: implement semantic search with connectrpc and pgvector
-b87b4bc  fix: resolve end-2-end semantic search pipeline and grpc serialization
-ac24faf  fix: mitigate kafka consumer race condition and metadata caching
-c027f4c  feat: build dlq architecture to consume errored messages
-b4b2f53  feat: implement HNSW vector indexing for embedding column
-22db3a1  feat: enforce rate limiting and payload protection
-860ddf6  feat: implement graceful shutdown for transactional outbox
-68658c8  feat: implement standalone DLQ replay script
-ee62058  feat: integrate end-to-end performance testing and prometheus metrics suite
-ca76d75  feat: automate load test performance report generation
-```
-
----
-
 ## Project Structure
 
 ```

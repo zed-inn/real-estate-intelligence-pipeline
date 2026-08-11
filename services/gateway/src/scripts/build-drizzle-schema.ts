@@ -110,7 +110,7 @@ function writeToFile(schema: Record<string, {type: string, definition: string, i
     }
   }
 
-  appendFileSync(absFilename, `}, (table) => [\n  index('embedding_index').using('hnsw', table.embedding.op('vector_cosine_ops')),\n])\n\n`);
+  appendFileSync(absFilename, `}, (table) => [\n  index('embedding_index').using('hnsw', table.embedding.op('vector_cosine_ops')),\n  index('fts_idx').using('gin', sql\`to_tsvector('english', \${table.intelligenceContext})\`)\n])\n\n`);
 }
 
 const FILENAME = "real-estate-drizzle-schema.ts";

@@ -19,5 +19,6 @@ embedding: vector('embedding', { dimensions: 384 }),
 createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => [
   index('embedding_index').using('hnsw', table.embedding.op('vector_cosine_ops')),
+  index('fts_idx').using('gin', sql`to_tsvector('english', ${table.intelligenceContext})`)
 ])
 
